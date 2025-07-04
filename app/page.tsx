@@ -23,20 +23,18 @@ export default function Home() {
 
       <div className="flex gap-3">
         <Link
-          isExternal
           className={buttonStyles({
             color: "primary",
             radius: "full",
             variant: "shadow",
           })}
-          href={siteConfig.links.instagram}
+          href="/signup"
         >
           Sign Up
         </Link>
         <Link
-          isExternal
           className={buttonStyles({ variant: "bordered", radius: "full" })}
-          href={siteConfig.links.instagram}
+          href="/authentication"
         >
           <GithubIcon size={20} />
           Sign In
