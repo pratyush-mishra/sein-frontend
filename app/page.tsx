@@ -36,7 +36,6 @@ export default function Home() {
           className={buttonStyles({ variant: "bordered", radius: "full" })}
           href="/authentication"
         >
-          <GithubIcon size={20} />
           Sign In
         </Link>
       </div>

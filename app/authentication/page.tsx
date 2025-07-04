@@ -13,6 +13,7 @@ export default function AuthenticationPage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,11 +25,37 @@ export default function AuthenticationPage() {
     e.preventDefault();
     setLoading(true);
     setError("");
-    // No API logic for now
-    setTimeout(() => {
+    setSuccess(false);
+    try {
+      // Adjust the URL to match your Django backend login endpoint
+      const res = await fetch("/api/auth/login/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: form.email,
+          password: form.password,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.detail || "Login failed");
+      }
+      const data = await res.json();
+      // Store token in localStorage (adjust key as needed)
+      if (data.token) {
+        localStorage.setItem("authToken", data.token);
+        setSuccess(true);
+        router.push("/inventory");
+      } else {
+        throw new Error("No token received");
+      }
+    } catch (err: any) {
+      setError(err.message || "Login failed");
+    } finally {
       setLoading(false);
-      setError("This is a demo. No authentication logic implemented.");
-    }, 1000);
+    }
   };
 
   const handleSignupRedirect = () => {
@@ -57,6 +84,7 @@ export default function AuthenticationPage() {
             required
           />
           {error && <div className="text-danger text-sm">{error}</div>}
+          {success && <div className="text-success text-sm">Login successful!</div>}
           <Button type="submit" color="primary" isLoading={loading}>
             Sign In
           </Button>
