@@ -1,12 +1,10 @@
 "use client";
 import { useState } from "react";
-import { Input } from "@heroui/input";
-import { Button } from "@heroui/button";
-import { Form } from '@heroui/form';
+import { Form, Input, Select, SelectItem, Checkbox, Button, form } from "@heroui/react";
 import { Card } from "@heroui/card";
 import { Textarea } from "@heroui/input"
 import { title } from "@/components/primitives";
-
+import { sign_up } from "../api/auth/login/route";
 export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [re_password, setRePassword] = useState("");
@@ -31,7 +29,7 @@ export default function SignupPage() {
     return null;
   };
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     if (profilePicture) {
@@ -72,6 +70,13 @@ export default function SignupPage() {
     setErrors({});
     setSubmitted(Object.fromEntries(formData.entries()));
     // Here you would POST formData to the backend
+    const res = await sign_up({
+      username: formData.get("username")?.toString(),
+      email: formData.get("email")?.toString(),
+      password: formData.get("password")?.toString(),
+      re_password: formData.get("re_password")?.toString()
+    });
+    
   };
 
   return (
