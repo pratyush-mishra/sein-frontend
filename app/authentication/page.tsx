@@ -5,7 +5,7 @@ import { Button } from "@heroui/button";
 import { Card } from "@heroui/card";
 import { title } from "@/components/primitives";
 import { useRouter } from "next/navigation";
-
+import { sign_in } from "../api/auth/login/route";
 export default function AuthenticationPage() {
   const [form, setForm] = useState({
     email: "",
@@ -28,24 +28,11 @@ export default function AuthenticationPage() {
     setSuccess(false);
     try {
       // Adjust the URL to match your Django backend login endpoint
-      const res = await fetch("/api/auth/login/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: form.email,
-          password: form.password,
-        }),
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.detail || "Login failed");
-      }
-      const data = await res.json();
+      
+     const data = await sign_in({email: form.email, password: form.password});
       // Store token in localStorage (adjust key as needed)
-      if (data.token) {
-        localStorage.setItem("authToken", data.token);
+      if (data.auth_token) {
+        localStorage.setItem("authToken", data.auth_token);
         setSuccess(true);
         router.push("/inventory");
       } else {
