@@ -34,7 +34,7 @@ export default function AuthenticationPage() {
       if (data.auth_token) {
         localStorage.setItem("authToken", data.auth_token);
         setSuccess(true);
-        router.push("/inventory");
+        router.push("/profile");
       } else {
         throw new Error("No token received");
       }

@@ -10,13 +10,12 @@ const profile = {
   profile_picture: "https://randomuser.me/api/portraits/men/32.jpg",
 };
 
-export default async function Profile(props : any) {
-    const params = await props.params;
-    const id = params.id;
-    console.log("id: "+ id);
-    return (
-    <div className="flex flex-col items-center justify-center py-10">
-      <h1 className={title()}>Profile</h1>
+export default async function Profile(props: any) {
+  const params = await props.params;
+  const id = params.id;
+  console.log("id: " + id);
+  return (
+    <div className="flex flex-col items-center justify-center">
       <Card className="w-full max-w-md mt-8 p-6 flex flex-col items-center">
         <img
           src={profile.profile_picture}
@@ -27,12 +26,8 @@ export default async function Profile(props : any) {
           <h2 className="text-2xl font-semibold mb-1">{profile.username}</h2>
           <p className="text-default-500 mb-2">{profile.email}</p>
           <p className="text-default-600 mb-4">{profile.bio}</p>
-          <div className="bg-default-100 rounded-lg p-3">
-            <span className="font-medium">Contact Details:</span>
-            <p className="text-default-600 mt-1">{profile.contact_details}</p>
-          </div>
         </div>
       </Card>
     </div>
-    )
+  )
 }

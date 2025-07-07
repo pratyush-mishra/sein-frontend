@@ -22,3 +22,19 @@ export interface SignUpResponse {
     re_password?: string[],
     id?: number
 }
+
+export interface UserData {
+    id: string,
+    email: string,
+    username: string,
+    bio: string | null,
+    contact_details: string | null,
+    profile_picture: string | null
+}
+
+export interface ProfileData {
+    email?: string,
+    username?: string,
+    bio?: string,
+    contact_details?: string
+}

@@ -76,7 +76,7 @@ export default function SignupPage() {
       password: formData.get("password")?.toString(),
       re_password: formData.get("re_password")?.toString()
     });
-    
+
   };
 
   return (
