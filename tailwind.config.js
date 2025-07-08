@@ -8,6 +8,9 @@ const config = {
     "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}"
   ],
   theme: {
+    // maxWidth: {
+    //   'lg':'50rem'
+    // },
     extend: {
       fontFamily: {
         sans: ["var(--font-sans)"],
