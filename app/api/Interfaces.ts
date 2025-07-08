@@ -13,7 +13,7 @@ export interface SignIn {
 export interface AuthResponse {
     auth_token:string,
     non_field_errors?: string[]
-}
+};
 
 export interface SignUpResponse {
     username: string | string[],
@@ -21,14 +21,31 @@ export interface SignUpResponse {
     password?: string[],
     re_password?: string[],
     id?: number
-}
+};
+
+
+export interface UserData {
+    id: string,
+    email: string,
+    username: string,
+    bio: string | null,
+    contact_details: string | null,
+    profile_picture: string | null
+};
+
+export interface ProfileData {
+    email?: string,
+    username?: string,
+    bio?: string,
+    contact_details?: string
+};
 
 export interface ImageUploadProps {
     maxFiles?: number;
     maxSize?: number;
     acceptedTypes?: string[];
     onImagesChange?: (files: File[]) => void;
-}
+};
 
 export interface CreateListing {
     title: string,
@@ -43,7 +60,7 @@ export interface CreateListing {
     comment?: string,
     image: File | File[],
     contact_details?: string
-}
+};
 
 export interface CreateListingResponse {
     id?: number,
@@ -55,7 +72,7 @@ export interface CreateListingResponse {
     is_approved?: boolean | string[],
     created_at?: Date | string[],
     updated_at?: Date | string[],
-}
+};
 
 export interface Listing {
     id: number;
@@ -74,4 +91,5 @@ export interface Listing {
     comment?: string;
     created_at?: string;
     updated_at?: string;
-  }
+  };
+
