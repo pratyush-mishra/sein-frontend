@@ -63,7 +63,7 @@ export default function MessagesClient({ initialMessages }: MessagesClientProps)
       try {
         const token = localStorage.getItem("authToken");
         if (!token) return;
-        const res = await fetch("http://localhost:8000/api/users/me/", {
+        const res = await fetch("http://localhost:8000/auth/users/me/", {
           headers: {
             Authorization: `Token ${token}`,
           },

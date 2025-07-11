@@ -5,16 +5,24 @@ import Link from "next/link";
 import MessageOwnerButton from "@/components/message-owner-button";
 import { Listing } from '@/app/api/Interfaces';
 
-export default function ListingDetailClient({ listing, ownerId, ownerUsername }: { listing: Listing, ownerId: number, ownerUsername: string }) {
+export default function ListingDetailClient({ listing, ownerId, ownerUsername }: {
+  listing: Listing,
+  ownerId: number,
+  ownerUsername: string,
+}) {
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [isPageLoading, setIsPageLoading] = useState(true);
+  const [form, setForm] = useState<Partial<Listing>>(listing);
+  useEffect(() => {
+    setForm(listing);
+  }, [listing]);
 
   useEffect(() => {
     async function fetchCurrentUser() {
       try {
         const token = localStorage.getItem("authToken");
         if (!token) return;
-        const res = await fetch("http://localhost:8000/api/users/me/", {
+        const res = await fetch("http://localhost:8000/auth/users/me/", {
           headers: {
             Authorization: `Token ${token}`,
           },
@@ -22,14 +30,11 @@ export default function ListingDetailClient({ listing, ownerId, ownerUsername }:
         if (!res.ok) return;
         const data = await res.json();
         setCurrentUserId(data.id);
-      } catch {
-        // ignore
+      } finally {
+        setIsPageLoading(false); // Set to false as soon as data is fetched
       }
     }
     fetchCurrentUser();
-    // Simulate loading for skeleton
-    const timeout = setTimeout(() => setIsPageLoading(false), 600);
-    return () => clearTimeout(timeout);
   }, []);
 
   if (isPageLoading) {

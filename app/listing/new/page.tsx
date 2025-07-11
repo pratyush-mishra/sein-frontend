@@ -82,24 +82,12 @@ export default function ListingPage() {
     };
   if (isPageLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-10">
+      <div className="flex flex-col items-center justify-center py-10 px-4">
         <h1 className={title()}><Skeleton className="h-10 w-64 rounded mb-4" /></h1>
-        <Card className="w-full max-w-4xl mt-8 p-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="flex flex-col gap-4">
-              {[...Array(8)].map((_, i) => (
-                <Skeleton key={i} className="h-10 w-full rounded" />
-              ))}
-            </div>
-            <div className="flex flex-col gap-4">
-              <Skeleton className="h-6 w-1/2 mb-2 rounded" />
-              <Skeleton className="h-40 w-full rounded" />
-            </div>
-          </div>
-          <div className="flex justify-center mt-6">
-            <Skeleton className="h-12 w-40 rounded" />
-          </div>
-        </Card>
+        {[...Array(2)].map((_, i) => <Skeleton key={i} className="h-10 w-full rounded" />)}
+        <Skeleton className="h-6 w-1/2 mb-2 rounded" />
+        <Skeleton className="h-40 w-full rounded" />
+        <Skeleton className="h-12 w-40 rounded mt-8" />
       </div>
     );
   }

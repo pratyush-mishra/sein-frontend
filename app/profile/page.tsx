@@ -1,95 +1,214 @@
-"use client"
-import { Card } from "@heroui/card";
+"use client";
+import { useEffect, useState, useRef } from "react";
+import { Input, Textarea, Button, Skeleton, Modal, ModalBody, ModalContent, ModalHeader, ModalFooter, useDisclosure } from "@heroui/react";
 import { title } from "@/components/primitives";
-import useSWR from "swr";
-import { useEffect, useState } from "react";
-import { UserData, ProfileData } from "../api/Interfaces";
-import { get_profile, patch_profile } from "../api/users/route";
-// Fake profile data
-const profile = {
-  username: "johndoe",
-  email: "johndoe@email.com",
-  firstName: "John",
-  lastName: "Doe",
-  bio: "A passionate member of SEIN, sharing resources and knowledge.",
-  contact_details: "123 Main St, City, Country | +1234567890",
-  profile_picture: "https://randomuser.me/api/portraits/men/32.jpg",
-};
 
 export default function ProfilePage() {
-  const [partialUser, setPartialUser] = useState<Partial<UserData>>({
-    username: 'guest',
-    profile_picture: '/default-avatar.png'
-  });
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [editLoading, setEditLoading] = useState(false);
+  const [editError, setEditError] = useState("");
+  const [editSuccess, setEditSuccess] = useState(false);
+  const [previewPic, setPreviewPic] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      const token = localStorage.getItem("authToken");
-      console.log("Token: " + token);
-      if (!token) {
-        throw new Error("No authentication token found");
+    async function fetchUser() {
+      setLoading(true);
+      setError("");
+      try {
+        const token = localStorage.getItem("authToken");
+        if (!token) throw new Error("Not authenticated");
+        const res = await fetch("http://localhost:8000/auth/users/me/", {
+          headers: { Authorization: `Token ${token}` },
+        });
+        if (!res.ok) throw new Error("Failed to fetch user");
+        const data = await res.json();
+        setUser(data);
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch user");
+      } finally {
+        setLoading(false);
       }
-      const userData = await get_profile(3, token);
-      setPartialUser(userData);
-    };
-    fetchUserProfile();
+    }
+    fetchUser();
   }, []);
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    const token = localStorage.getItem("authToken");
-    if (!token) {
-      throw new Error("No authentication token found");
-    }
+  // Handle edit form submit
+  async function handleEditSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    console.log(formData);
-    let profileData: ProfileData = {};
-    profileData.bio = formData.get("bio")?.toString();
-    profileData.contact_details = formData.get("contact-info")?.toString();
-    console.log(JSON.stringify(profileData));
-    await patch_profile(token, profileData)
+    setEditLoading(true);
+    setEditError("");
+    setEditSuccess(false);
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) throw new Error("Not authenticated");
+      const formData = new FormData(e.currentTarget);
+      // If no new file selected, don't send profile_picture
+      if (!formData.get("profile_picture")) {
+        formData.delete("profile_picture");
+      }
+      const res = await fetch("http://localhost:8000/auth/users/me/", {
+        method: "PATCH",
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+        body: formData,
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.detail || "Failed to update profile");
+      }
+      const updated = await res.json();
+      setUser(updated);
+      setEditSuccess(true);
+      onOpenChange();
+    } catch (err: any) {
+      setEditError(err.message || "Failed to update profile");
+    } finally {
+      setEditLoading(false);
+    }
   }
-  return (
-    <div className="flex flex-col w-100 mt-10">
-      <div className="flex flex-row m-4 gap-1">
-        <div className="flex-1 align-middle w-64 me-4">
-          <strong>
-            Profile
-          </strong>
-        </div>
-        <div className="text-left flex-grow basis-80 ">
-          <form onSubmit={onSubmit}>
-            <div className="mb-4">
-              <strong>Username:</strong>
-              <p>{partialUser.username}</p>
-            </div>
-            <div className="mb-4">
-              <strong>First Name:</strong>
-              <p>John</p>
-            </div>
-            <div className="mb-4">
-              <strong>Last Name:</strong>
-              <p>Doe</p>
-            </div>
-            <div className="mb-4">
-              <strong>Email:</strong>
-              <p className="">{partialUser.email}</p>
-            </div>
-            <div className="mb-4">
-              <strong>About:</strong>
-              <br />
-              <textarea className="w-64 h-40 p-2 resize-none rounded-md" name="bio" defaultValue={partialUser.bio ? partialUser.bio : ""} placeholder="A short description about yourself or your organization."></textarea>
-            </div>
-            <div className="mb-4 gap-y-1">
-              <strong>Contact Info:</strong>
-              <br />
-              <textarea className="w-64 h-32 p-2 resize-none rounded-md" name="contact-info" defaultValue={partialUser.contact_details ? partialUser.contact_details : ""} placeholder="Your contact info"></textarea>
-            </div>
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onSubmit={() => {
 
-            }}>Submit</button>
-          </form>
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => setPreviewPic(ev.target?.result as string);
+      reader.readAsDataURL(file);
+    } else {
+      setPreviewPic(null);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-10 px-4">
+        <h1 className={title()}><Skeleton className="h-10 w-64 rounded mb-4" /></h1>
+        <div className="flex flex-col md:flex-row gap-8 w-full max-w-2xl mt-8">
+          <div className="flex flex-col items-center md:items-start gap-4 w-full md:w-1/3">
+            <Skeleton className="w-32 h-32 rounded-full" />
+            <Skeleton className="h-6 w-32 rounded" />
+          </div>
+          <div className="flex-1 flex flex-col gap-4">
+            {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-6 w-full rounded" />)}
+          </div>
+        </div>
+        <Skeleton className="h-12 w-40 rounded mt-8" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className="text-center text-danger mt-8">{error}</div>;
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-center py-10 px-4">
+      <h1 className={title()}>Profile</h1>
+      <div className="flex flex-col md:flex-row gap-8 w-full max-w-2xl mt-8">
+        {/* Profile Picture and Username */}
+        <div className="flex flex-col items-center md:items-start gap-4 w-full md:w-1/3">
+          <img
+            src={user.profile_picture || "/default-profile.png"}
+            alt={user.username}
+            className="w-32 h-32 rounded-full object-cover border-4 border-primary"
+          />
+          <div className="text-center md:text-left">
+            <h2 className="text-2xl font-semibold mb-1">{user.username}</h2>
+            <p className="text-default-500">{user.email}</p>
+          </div>
+        </div>
+        {/* Details */}
+        <div className="flex-1 flex flex-col gap-4">
+          <div>
+            <span className="font-medium">Bio:</span>
+            <p className="text-default-600 mt-1 whitespace-pre-line">{user.bio || <span className="text-default-400">No bio provided.</span>}</p>
+          </div>
+          <div>
+            <span className="font-medium">Contact Details:</span>
+            <p className="text-default-600 mt-1 whitespace-pre-line">{user.contact_details || <span className="text-default-400">No contact details provided.</span>}</p>
+          </div>
         </div>
       </div>
+      <div className="flex justify-center mt-8 w-full">
+        <Button color="primary" size="lg" className="px-8" onPress={onOpen}>
+          Edit Profile
+        </Button>
+      </div>
+      {/* Edit Profile Modal */}
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center">
+        <ModalContent>
+          <ModalHeader>Edit Profile</ModalHeader>
+          <form onSubmit={handleEditSubmit} encType="multipart/form-data">
+            <ModalBody>
+              <div className="flex flex-col md:flex-row gap-8 w-full">
+                <div className="flex flex-col items-center md:items-start gap-4 w-full md:w-1/3">
+                  <img
+                    src={previewPic || user.profile_picture || "/default-profile.png"}
+                    alt={user.username}
+                    className="w-32 h-32 rounded-full object-cover border-4 border-primary"
+                  />
+                  <Button
+                    type="button"
+                    variant="bordered"
+                    onPress={() => fileInputRef.current?.click()}
+                  >
+                    Change Picture
+                  </Button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    name="profile_picture"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
+                </div>
+                <div className="flex-1 flex flex-col gap-4">
+                  <Input
+                    label="Username"
+                    name="username"
+                    defaultValue={user.username}
+                    isRequired
+                  />
+                  <Input
+                    label="Email"
+                    name="email"
+                    type="email"
+                    defaultValue={user.email}
+                    isRequired
+                  />
+                  <Textarea
+                    label="Bio"
+                    name="bio"
+                    defaultValue={user.bio || ""}
+                    minRows={3}
+                  />
+                  <Textarea
+                    label="Contact Details"
+                    name="contact_details"
+                    defaultValue={user.contact_details || ""}
+                    minRows={2}
+                  />
+                </div>
+              </div>
+              {editError && <div className="text-danger text-xs mt-2">{editError}</div>}
+              {editSuccess && <div className="text-success text-xs mt-2">Profile updated successfully!</div>}
+            </ModalBody>
+            <ModalFooter>
+              <Button color="primary" type="submit" isLoading={editLoading}>
+                Save
+              </Button>
+              <Button variant="light" onPress={onOpenChange} type="button">
+                Cancel
+              </Button>
+            </ModalFooter>
+          </form>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { Listing } from '@/app/api/Interfaces';
 
 export default function InventoryClient({ listings }: { listings: Listing[] }) {
   const isLoading = !listings || listings.length === 0;
+  // Show skeletons only while loading
   return (
     <div>
       <h1 className={`${title()} text-center`}>Inventory</h1>
