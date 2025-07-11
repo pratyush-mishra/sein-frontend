@@ -4,10 +4,9 @@ import { title } from "@/components/primitives"
 import { Card } from "@heroui/card";
 import { Textarea } from "@heroui/input"
 import { Input } from "@heroui/input";
-import { Form, Radio, RadioGroup, NumberInput, Dropdown, DropdownTrigger, Button, DropdownMenu, DropdownItem, Select, SelectItem} from "@heroui/react";
+import { Form, Radio, RadioGroup, NumberInput, Dropdown, DropdownTrigger, Button, DropdownMenu, DropdownItem, Select, SelectItem, Skeleton } from "@heroui/react";
 import  ImageUpload from "@/components/image-upload";
 import { useRouter } from "next/navigation";
-
 
 export default function ListingPage() {
     const [isFee, setIsFee] = useState("no");
@@ -15,6 +14,7 @@ export default function ListingPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
+    const [isPageLoading, setIsPageLoading] = useState(true);
     const availability = [
         {key:"pickup", label:"Pick Up"},
         {key:"dropoff", label:"Drop Off"},
@@ -32,6 +32,9 @@ export default function ListingPage() {
         if (typeof window !== "undefined" && !localStorage.getItem("authToken")) {
             router.replace("/authentication");
         }
+        // Simulate loading for skeleton
+        const timeout = setTimeout(() => setIsPageLoading(false), 600);
+        return () => clearTimeout(timeout);
     }, [router]);
     const handleImagesChange = (files: File[]) => {
         setSelectedImages(files);
@@ -77,6 +80,29 @@ export default function ListingPage() {
             setLoading(false);
         }
     };
+  if (isPageLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-10">
+        <h1 className={title()}><Skeleton className="h-10 w-64 rounded mb-4" /></h1>
+        <Card className="w-full max-w-4xl mt-8 p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="flex flex-col gap-4">
+              {[...Array(8)].map((_, i) => (
+                <Skeleton key={i} className="h-10 w-full rounded" />
+              ))}
+            </div>
+            <div className="flex flex-col gap-4">
+              <Skeleton className="h-6 w-1/2 mb-2 rounded" />
+              <Skeleton className="h-40 w-full rounded" />
+            </div>
+          </div>
+          <div className="flex justify-center mt-6">
+            <Skeleton className="h-12 w-40 rounded" />
+          </div>
+        </Card>
+      </div>
+    );
+  }
   return (
      <div className="flex flex-col items-center justify-center py-10">
             <h1 className={title()}>Add new Resource</h1>

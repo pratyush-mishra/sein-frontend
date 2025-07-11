@@ -91,5 +91,18 @@ export interface Listing {
     comment?: string;
     created_at?: string;
     updated_at?: string;
-  };
+  }
 
+export interface Message {
+    id: number;
+    listing: number | { title?: string; id?: number };
+    sender: { username: string; id?: number } | string;
+    recipient: { username: string; id?: number } | string;
+    content: string;
+    timestamp: string;
+  }
+  
+export interface MessagesClientProps {
+    initialMessages: Message[];
+  }
+  

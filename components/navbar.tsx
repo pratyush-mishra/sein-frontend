@@ -1,3 +1,4 @@
+"use client";
 import {
   Navbar as HeroUINavbar,
   NavbarContent,
@@ -14,6 +15,7 @@ import { Input } from "@heroui/input";
 import { link as linkStyles } from "@heroui/theme";
 import NextLink from "next/link";
 import clsx from "clsx";
+import { useEffect, useState } from "react";
 
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
@@ -26,6 +28,14 @@ import {
 } from "@/components/icons";
 
 export const Navbar = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsAuthenticated(!!localStorage.getItem("authToken"));
+    }
+  }, []);
+
   const searchInput = (
     <Input
       aria-label="Search"
@@ -56,22 +66,55 @@ export const Navbar = () => {
             <p className="font-bold text-inherit">SEIN</p>
           </NextLink>
         </NavbarBrand>
-        <ul className="hidden lg:flex gap-4 justify-start ml-2">
-          {siteConfig.navItems.map((item) => (
-            <NavbarItem key={item.href}>
+        {/* Authenticated Tabs */}
+        {isAuthenticated && (
+          <ul className="hidden lg:flex gap-4 justify-start ml-2">
+            <NavbarItem>
               <NextLink
                 className={clsx(
                   linkStyles({ color: "foreground" }),
                   "data-[active=true]:text-primary data-[active=true]:font-medium",
                 )}
                 color="foreground"
-                href={item.href}
+                href="/inventory"
               >
-                {item.label}
+                Inventory
               </NextLink>
             </NavbarItem>
-          ))}
-        </ul>
+            <NavbarItem>
+              <NextLink
+                className={clsx(
+                  linkStyles({ color: "foreground" }),
+                  "data-[active=true]:text-primary data-[active=true]:font-medium",
+                )}
+                color="foreground"
+                href="/messages"
+              >
+                Messages
+              </NextLink>
+            </NavbarItem>
+            <NavbarItem>
+              <NextLink
+                className={clsx(
+                  linkStyles({ color: "foreground" }),
+                  "data-[active=true]:text-primary data-[active=true]:font-medium",
+                )}
+                color="foreground"
+                href="/profile/me"
+              >
+                Profile
+              </NextLink>
+            </NavbarItem>
+            <NavbarItem>
+              <NextLink
+                href="/listing/new"
+                className="ml-2 px-4 py-2 rounded-lg bg-primary text-white font-semibold hover:bg-primary/80 transition-colors"
+              >
+                + New Resource
+              </NextLink>
+            </NavbarItem>
+          </ul>
+        )}
       </NavbarContent>
 
       <NavbarContent
