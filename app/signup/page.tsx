@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Form, Input, Select, SelectItem, Checkbox, Button, form } from "@heroui/react";
+import { Form, Input, Select, SelectItem, Checkbox, Button, form, Modal, ModalBody, ModalContent, ModalHeader, ModalFooter, useDisclosure } from "@heroui/react";
 import { Card } from "@heroui/card";
 import { Textarea } from "@heroui/input"
 import { title } from "@/components/primitives";
@@ -14,6 +14,7 @@ export default function SignupPage() {
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [bio, setBio] = useState("");
   const [contactDetails, setContactDetails] = useState("");
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   // Real-time password validation
   const getPasswordError = (value: string) => {
@@ -31,6 +32,9 @@ export default function SignupPage() {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
+    setErrors({});
+    setSubmitted(null);
     const formData = new FormData(e.currentTarget);
     if (profilePicture) {
       formData.set("profile_picture", profilePicture);
@@ -64,19 +68,30 @@ export default function SignupPage() {
     }
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      setLoading(false);
       return;
     }
     // clear errors and submit
     setErrors({});
     setSubmitted(Object.fromEntries(formData.entries()));
-    // Here you would POST formData to the backend
-    const res = await sign_up({
-      username: formData.get("username")?.toString(),
-      email: formData.get("email")?.toString(),
-      password: formData.get("password")?.toString(),
-      re_password: formData.get("re_password")?.toString()
-    });
-
+    try {
+      const res = await fetch("http://localhost:8000/auth/users/", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setErrors(data);
+        setLoading(false);
+        return;
+      }
+      setSubmitted({ success: true });
+      onOpen(); // Open the modal on success
+    } catch (err: any) {
+      setErrors({ general: err.message || "Signup failed" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -141,7 +156,7 @@ export default function SignupPage() {
             name="contact_details"
             labelPlacement="outside"
             value={contactDetails}
-            onChange={e => setBio(e.target.value)}
+            onChange={e => setContactDetails(e.target.value)}
             maxRows={4}
             placeholder="Enter your primary contact details"
           />
@@ -158,8 +173,20 @@ export default function SignupPage() {
             Sign Up
           </Button>
         </Form>
-        {submitted && (
-          <div className="mt-4 text-success text-sm">Signup data ready for backend: {JSON.stringify(submitted)}</div>
+        {submitted && submitted.success && (
+          <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center">
+            <ModalContent>
+              <ModalHeader>Signup Request Created</ModalHeader>
+              <ModalBody>
+                Thanks for signing up. Please wait while we review your details. You'll get an email once your account is approved.
+              </ModalBody>
+              <ModalFooter>
+                <Button color="primary" onPress={onOpenChange}>
+                  Close
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
         )}
       </Card>
     </div>

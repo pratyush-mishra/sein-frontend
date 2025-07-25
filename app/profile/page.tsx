@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 import { Input, Textarea, Button, Skeleton, Modal, ModalBody, ModalContent, ModalHeader, ModalFooter, useDisclosure } from "@heroui/react";
 import { title } from "@/components/primitives";
+import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
   const [user, setUser] = useState<any>(null);
@@ -13,20 +14,35 @@ export default function ProfilePage() {
   const [previewPic, setPreviewPic] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [listings, setListings] = useState<any[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchUser() {
       setLoading(true);
       setError("");
       try {
-        const token = localStorage.getItem("authToken");
+        const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
         if (!token) throw new Error("Not authenticated");
         const res = await fetch("http://localhost:8000/auth/users/me/", {
-          headers: { Authorization: `Token ${token}` },
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
         });
-        if (!res.ok) throw new Error("Failed to fetch user");
+        if (!res.ok) throw new Error("Not authenticated");
         const data = await res.json();
         setUser(data);
+        // Fetch all listings and filter for current user
+        const listingsRes = await fetch("http://localhost:8000/api/listings/", {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        if (listingsRes.ok) {
+          const allListings = await listingsRes.json();
+          const userListings = allListings.filter((l: any) => l.owner && l.owner.id === data.id && l.is_approved);
+          setListings(userListings);
+        }
       } catch (err: any) {
         setError(err.message || "Failed to fetch user");
       } finally {
@@ -43,17 +59,13 @@ export default function ProfilePage() {
     setEditError("");
     setEditSuccess(false);
     try {
-      const token = localStorage.getItem("authToken");
+      const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
       if (!token) throw new Error("Not authenticated");
-      const formData = new FormData(e.currentTarget);
-      // If no new file selected, don't send profile_picture
-      if (!formData.get("profile_picture")) {
-        formData.delete("profile_picture");
-      }
+      const formData = new FormData(e.currentTarget); // Ensure formData is defined
       const res = await fetch("http://localhost:8000/auth/users/me/", {
         method: "PATCH",
         headers: {
-          Authorization: `Token ${token}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: formData,
       });
@@ -133,6 +145,28 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+      {/* User's Active Listings */}
+      {listings.length > 0 && (
+        <div className="w-full max-w-2xl mt-12">
+          <h2 className="text-xl font-semibold mb-4">Your Active Listings</h2>
+          <div className="space-y-6">
+            {listings.map(listing => (
+              <div key={listing.id} className="border rounded-lg p-4 flex flex-col gap-2 bg-white">
+                <div className="flex flex-col md:flex-row gap-4">
+                  <img src={listing.images && listing.images[0] ? listing.images[0].image : '/default-profile.png'} alt={listing.title} className="w-24 h-24 object-cover rounded" />
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold">{listing.title}</h3>
+                    <p className="text-default-600">{listing.description}</p>
+                  </div>
+                </div>
+                <Button color="primary" className="mt-2 w-fit" onPress={() => router.push(`/listing/edit/${listing.id}`)}>
+                  Edit Listing
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       <div className="flex justify-center mt-8 w-full">
         <Button color="primary" size="lg" className="px-8" onPress={onOpen}>
           Edit Profile

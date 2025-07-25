@@ -79,7 +79,7 @@ export interface Listing {
     owner?: object,
     title: string;
     description: string;
-    image?: string;
+    images?: { id: number; image: string }[];
     contact_details?: string;
     category?: string;
     qty?: number;
@@ -95,7 +95,8 @@ export interface Listing {
 
 export interface Message {
     id: number;
-    listing: number | { title?: string; id?: number };
+    listing: { id: number; title?: string; [key: string]: any };
+    listing_id?: number; // for write operations
     sender: { username: string; id?: number } | string;
     recipient: { username: string; id?: number } | string;
     content: string;

@@ -18,7 +18,6 @@ const config = {
       },
     },
   },
-  darkMode: "class",
   plugins: [
     heroui({
       themes: {
@@ -45,19 +44,11 @@ const config = {
               300: "#93c5fd",
               400: "#60a5fa",
               500: "#f13f21", // Main primary color
-              600: "#2563eb",
+              600: "#2474b4",
               700: "#1d4ed8",
               800: "#1e40af",
               900: "#1e3a8a",
               DEFAULT: "#f13f21",
-              foreground: "#ffffff",
-            },
-          },
-        },
-        dark: {
-          colors: {
-            primary: {
-              DEFAULT: "#1e99a1",
               foreground: "#ffffff",
             },
           },

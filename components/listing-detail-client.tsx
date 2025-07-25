@@ -4,6 +4,7 @@ import { Chip, Skeleton } from "@heroui/react";
 import Link from "next/link";
 import MessageOwnerButton from "@/components/message-owner-button";
 import { Listing } from '@/app/api/Interfaces';
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function ListingDetailClient({ listing, ownerId, ownerUsername }: {
   listing: Listing,
@@ -13,6 +14,7 @@ export default function ListingDetailClient({ listing, ownerId, ownerUsername }:
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [form, setForm] = useState<Partial<Listing>>(listing);
+  const [currentImageIdx, setCurrentImageIdx] = useState(0);
   useEffect(() => {
     setForm(listing);
   }, [listing]);
@@ -20,16 +22,18 @@ export default function ListingDetailClient({ listing, ownerId, ownerUsername }:
   useEffect(() => {
     async function fetchCurrentUser() {
       try {
-        const token = localStorage.getItem("authToken");
+        const token = localStorage.getItem("access_token");
         if (!token) return;
         const res = await fetch("http://localhost:8000/auth/users/me/", {
           headers: {
-            Authorization: `Token ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         });
         if (!res.ok) return;
-        const data = await res.json();
-        setCurrentUserId(data.id);
+        const userData = await res.json();
+        setCurrentUserId(userData.id);
+      } catch (error) {
+        console.error("Failed to fetch current user:", error);
       } finally {
         setIsPageLoading(false); // Set to false as soon as data is fetched
       }
@@ -65,59 +69,106 @@ export default function ListingDetailClient({ listing, ownerId, ownerUsername }:
   }
 
   return (
-    <div className="max-w-2xl mx-auto mt-10 px-4 w-full">
-      <div className="flex flex-col md:flex-row gap-8">
-        {/* Image */}
-        {listing.image && (
-          <div className="flex-shrink-0 w-full md:w-1/2 flex items-center justify-center">
+    <div className="max-w-6xl mx-auto mt-10 px-2 sm:px-4 w-full">
+      <div className="flex flex-col lg:flex-row gap-16">
+        {/* Image Carousel */}
+        <div className="flex-shrink-0 w-full lg:w-1/2 flex flex-col items-center justify-center relative">
+          {Array.isArray(listing.images) && listing.images.length > 0 ? (
+            <>
+              <div className="relative w-full max-w-[32rem] h-[28rem] flex items-center justify-center">
+                <img
+                  src={listing.images?.[currentImageIdx]?.image || "/default-profile.png"}
+                  alt={listing.title}
+                  className="w-full h-[36rem] max-w-[48rem] object-cover rounded-2xl shadow-2xl border-4 border-primary"
+                />
+                {listing.images?.length > 1 && (
+                  <>
+                    <button
+                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-2 shadow hover:bg-white z-10"
+                      onClick={() => setCurrentImageIdx((prev) => (prev === 0 ? (listing.images?.length || 1) - 1 : prev - 1))}
+                      aria-label="Previous image"
+                    >
+                      <ChevronLeft size={32} />
+                    </button>
+                    <button
+                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-2 shadow hover:bg-white z-10"
+                      onClick={() => setCurrentImageIdx((prev) => (prev === (listing.images?.length || 1) - 1 ? 0 : prev + 1))}
+                      aria-label="Next image"
+                    >
+                      <ChevronRight size={32} />
+                    </button>
+                  </>
+                )}
+                {listing.images?.length > 1 && (
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                    {listing.images?.map((img: any, idx: number) => (
+                      <span
+                        key={img.id}
+                        className={`inline-block w-3 h-3 rounded-full ${idx === currentImageIdx ? 'bg-primary' : 'bg-default-300'}`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
             <img
-              src={listing.image}
-              alt={listing.title}
-              className="w-full h-64 object-cover rounded-lg shadow-md"
+              src="/default-profile.png"
+              alt="No image"
+              className="w-full h-[36rem] max-w-[48rem] object-cover rounded-2xl shadow-2xl border-4 border-primary"
             />
-          </div>
-        )}
+          )}
+        </div>
         {/* Info */}
-        <div className="flex-1 flex flex-col gap-4">
-          <h1 className="text-3xl font-bold mb-2 break-words">{listing.title}</h1>
-          <div className="flex flex-wrap gap-2 items-center mb-2">
+        <div className="flex-1 flex flex-col gap-10 bg-white/80 rounded-2xl p-10 shadow-lg border border-default-200 min-w-0">
+          <h1 className="text-5xl font-extrabold mb-4 break-words text-primary drop-shadow-lg">{listing.title}</h1>
+          {/* Creator/Owner */}
+          <div className="mb-2 text-lg text-default-700 font-medium flex items-center gap-2">
+            <span>By:</span>
+            <span className="text-primary font-bold">
+              {ownerUsername || (listing.owner && (listing.owner as any).username) || 'Unknown'}
+            </span>
+          </div>
+          {/* Key Attributes Row */}
+          <div className="flex flex-wrap gap-6 items-center mb-4 border-b border-default-200 pb-4">
             {listing.category && (
-              <Chip color="primary" variant="solid" size="md">
+              <Chip color="primary" variant="solid" size="lg" className="text-xl px-4 py-2">
                 {categoryLabel(listing.category)}
               </Chip>
             )}
             {listing.qty !== undefined && (
-              <span className="text-sm bg-default-100 rounded px-2 py-1">Qty: {listing.qty}</span>
+              <span className="text-lg bg-default-100 rounded px-4 py-2 font-semibold">Qty: {listing.qty}</span>
             )}
             {listing.is_fee && listing.fee !== undefined && (
-              <span className="text-sm bg-default-100 rounded px-2 py-1">Fee: {listing.fee}</span>
+              <span className="text-lg bg-default-100 rounded px-4 py-2 font-semibold">Fee: {listing.fee}</span>
             )}
           </div>
-          <p className="text-default-600 mb-2 whitespace-pre-line">{listing.description}</p>
-          {listing.dimensions && (
-            <div className="text-sm text-default-500"><span className="font-semibold">Dimensions:</span> {listing.dimensions}</div>
-          )}
-          {listing.availability && (
-            <div className="text-sm text-default-500"><span className="font-semibold">Availability:</span> {listing.availability}</div>
-          )}
-          {listing.condition && (
-            <div className="text-sm text-default-500"><span className="font-semibold">Condition:</span> {listing.condition}</div>
-          )}
-          {listing.comment && (
-            <div className="text-sm text-default-500"><span className="font-semibold">Comment:</span> {listing.comment}</div>
-          )}
-          {listing.contact_details && (
-            <div className="text-sm text-default-500"><span className="font-semibold">Contact:</span> {listing.contact_details}</div>
-          )}
-          <div className="text-xs text-default-400 mt-2">
-            Created: {listing.created_at && new Date(listing.created_at).toLocaleString()}<br />
-            Updated: {listing.updated_at && new Date(listing.updated_at).toLocaleString()}
-          </div>
-          {ownerId && (
-            <div className="mt-2">
-              <Link href={`/profile/${ownerId}`} className="text-blue-600 hover:underline text-sm">View Owner Profile</Link>
+          {/* Details List */}
+          <div className="flex flex-col gap-4 text-lg">
+            <div>
+              <span className="font-semibold">Description:</span>
+              <span className="ml-2 text-default-700 whitespace-pre-line leading-relaxed">{listing.description}</span>
             </div>
-          )}
+            {listing.dimensions && (
+              <div><span className="font-semibold">Dimensions:</span> <span className="ml-2 text-default-500">{listing.dimensions}</span></div>
+            )}
+            {listing.availability && (
+              <div><span className="font-semibold">Availability:</span> <span className="ml-2 text-default-500">{listing.availability}</span></div>
+            )}
+            {listing.condition && (
+              <div><span className="font-semibold">Condition:</span> <span className="ml-2 text-default-500">{listing.condition}</span></div>
+            )}
+            {listing.comment && (
+              <div><span className="font-semibold">Comment:</span> <span className="ml-2 text-default-500">{listing.comment}</span></div>
+            )}
+            {listing.contact_details && (
+              <div><span className="font-semibold">Contact:</span> <span className="ml-2 text-default-500">{listing.contact_details}</span></div>
+            )}
+          </div>
+          <div className="text-base text-default-400 mt-4 border-t border-default-200 pt-4">
+            <span className="font-semibold">Created:</span> {listing.created_at && new Date(listing.created_at).toLocaleString()}<br />
+            <span className="font-semibold">Updated:</span> {listing.updated_at && new Date(listing.updated_at).toLocaleString()}
+          </div>
         </div>
       </div>
       {/* Message Owner Button and Modal */}

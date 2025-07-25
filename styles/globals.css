@@ -1,3 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html, body {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* Repeating background image with 50% opacity */
+/* .bg-art-repeat {
+  position: relative;
+  z-index: 0;
+}
+.bg-art-repeat::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url('/bg-art.png');
+  background-repeat: no-repeat;
+  background-size: 50% 40%;
+  background-position: center;
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: -1;
+} */

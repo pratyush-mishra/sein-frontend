@@ -4,7 +4,7 @@ import { title } from "@/components/primitives"
 import { Card } from "@heroui/card";
 import { Textarea } from "@heroui/input"
 import { Input } from "@heroui/input";
-import { Form, Radio, RadioGroup, NumberInput, Dropdown, DropdownTrigger, Button, DropdownMenu, DropdownItem, Select, SelectItem, Skeleton } from "@heroui/react";
+import { Form, Radio, RadioGroup, NumberInput, Dropdown, DropdownTrigger, Button, DropdownMenu, DropdownItem, Select, SelectItem, Skeleton, Modal, ModalBody, ModalContent, ModalHeader, ModalFooter, useDisclosure } from "@heroui/react";
 import  ImageUpload from "@/components/image-upload";
 import { useRouter } from "next/navigation";
 
@@ -16,9 +16,9 @@ export default function ListingPage() {
     const [success, setSuccess] = useState(false);
     const [isPageLoading, setIsPageLoading] = useState(true);
     const availability = [
-        {key:"pickup", label:"Pick Up"},
-        {key:"dropoff", label:"Drop Off"},
-        {key:"onsite", label:"Only used on site"}
+        {key:"pickup", label:"Available for Pick Up"},
+        {key:"dropoff", label:"Available for Drop Off"},
+        {key:"onsite", label:"Available to be used only on site"}
     ];
     const categories = [
         { key: "office_material", label: "Office Material" },
@@ -28,10 +28,8 @@ export default function ListingPage() {
         { key: "other", label: "Other" },
     ];
     const router = useRouter();
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
     useEffect(() => {
-        if (typeof window !== "undefined" && !localStorage.getItem("authToken")) {
-            router.replace("/authentication");
-        }
         // Simulate loading for skeleton
         const timeout = setTimeout(() => setIsPageLoading(false), 600);
         return () => clearTimeout(timeout);
@@ -50,7 +48,7 @@ export default function ListingPage() {
             const formData = new FormData(form);
             // Add images to formData
             selectedImages.forEach((file, idx) => {
-                formData.append("image", file); // Django expects 'image' field for each image
+                formData.append("images", file); // Django expects 'images' field for each image
             });
             // Convert availability to a comma-separated string if needed
             if (formData.getAll("availability").length > 1) {
@@ -63,7 +61,7 @@ export default function ListingPage() {
             const res = await fetch("http://localhost:8000/api/listings/", {
                 method: "POST",
                 headers: {
-                    Authorization: `Token ${localStorage.getItem("authToken")}`,
+                    Authorization: `Bearer ${localStorage.getItem("access_token")}`,
                 },
                 body: formData,
             });
@@ -72,6 +70,7 @@ export default function ListingPage() {
                 throw new Error(data.detail || "Failed to create listing");
             }
             setSuccess(true);
+            onOpen(); // Open the modal on success
             form.reset();
             setSelectedImages([]);
         } catch (err: any) {
@@ -93,7 +92,7 @@ export default function ListingPage() {
   }
   return (
      <div className="flex flex-col items-center justify-center py-10">
-            <h1 className={title()}>Add new Resource</h1>
+            <h1 className={title()}>Share a new Resource</h1>
             <Card className="w-full max-w-4xl mt-8 p-6">
                 <Form className="flex flex-col gap-6" encType="multipart/form-data" onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -105,6 +104,7 @@ export default function ListingPage() {
                                 labelPlacement="outside"
                                 name="title"
                                 placeholder="Enter title of the resource"
+                                size="lg"
                             />
                             <Textarea
                                 isRequired
@@ -113,13 +113,18 @@ export default function ListingPage() {
                                 labelPlacement="outside"
                                 maxRows={4}
                                 placeholder="Give additional information about the resource"
+                                size="lg"
                             />
                             <NumberInput
                                 isRequired
+                                hideStepper
                                 label="Quantity"
                                 labelPlacement="outside"
                                 name="qty"
+                                defaultValue={1}
                                 placeholder="Enter the quantity of item(s)"
+                                minValue={1}
+                                size="lg"
                             />
                             <RadioGroup 
                                 isRequired 
@@ -129,6 +134,7 @@ export default function ListingPage() {
                                 defaultValue="no" 
                                 orientation="horizontal" 
                                 onValueChange={setIsFee}
+                                
                             >
                                 <Radio value="yes">Yes</Radio>
                                 <Radio value="no">No</Radio>
@@ -139,6 +145,7 @@ export default function ListingPage() {
                                 name="fee"
                                 placeholder="NA"
                                 isRequired={isFee === "yes"}
+                                size="lg"
                             />
 
                             <Textarea
@@ -147,6 +154,7 @@ export default function ListingPage() {
                                 labelPlacement="outside"
                                 maxRows={2}
                                 placeholder="Give measurements/dimensions or capacity of the item"
+                                size="lg"
                             />
 
                             <Select
@@ -155,6 +163,7 @@ export default function ListingPage() {
                                 name="availability"
                                 placeholder="Select availability"
                                 selectionMode="multiple"
+                                size="lg"
                             >
                                 {availability.map((availability) => (
                                     <SelectItem key={availability.key}>{availability.label}</SelectItem>
@@ -166,7 +175,8 @@ export default function ListingPage() {
                                 name="condition"
                                 labelPlacement="outside"
                                 maxRows={2}
-                                placeholder="Describe the condition of item"
+                                placeholder="Describe the condition of item."
+                                size="lg"
                             />
 
                             <Select
@@ -176,6 +186,7 @@ export default function ListingPage() {
                                 placeholder="Select category"
                                 selectionMode="multiple"
                                 isRequired
+                                size="lg"
                             >
                                 {categories.map((cat) => (
                                     <SelectItem key={cat.key}>{cat.label}</SelectItem>
@@ -208,7 +219,22 @@ export default function ListingPage() {
                         </Button>
                     </div>
                     {error && <div className="text-danger text-sm text-center mt-2">{error}</div>}
-                    {success && <div className="text-success text-sm text-center mt-2">Resource created successfully!</div>}
+                    {/* Success Modal */}
+                    {success && (
+                      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center">
+                        <ModalContent>
+                          <ModalHeader>Submission Received</ModalHeader>
+                          <ModalBody>
+                            Thank you for sharing your resource. We will now review it to make sure it meets our community guidelines. You'll get a once it gets approved and visible to other members!
+                          </ModalBody>
+                          <ModalFooter>
+                            <Button color="primary" onPress={onOpenChange}>
+                              Close
+                            </Button>
+                          </ModalFooter>
+                        </ModalContent>
+                      </Modal>
+                    )}
                 </Form>
             </Card>
         </div>

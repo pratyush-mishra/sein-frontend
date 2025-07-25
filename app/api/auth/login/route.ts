@@ -3,7 +3,7 @@ import { AuthResponse, SignIn, SignUp, SignUpResponse } from "@/app/api/Interfac
 import { POST } from "../../api";
 
 export async function sign_in(data: SignIn) : Promise<AuthResponse> {
-    const res = await POST<AuthResponse>("http://localhost:8000/auth/token/login/", data)
+    const res = await POST<AuthResponse>("http://localhost:8000/auth/jwt/create/", data)
     return res;
 }
 

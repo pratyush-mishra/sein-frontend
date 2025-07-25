@@ -3,5 +3,11 @@ export default function MessagesLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10 w-full">
+      <div className="w-full max-w-7xl mx-auto px-4">
+        {children}
+      </div>
+    </section>
+  );
 }

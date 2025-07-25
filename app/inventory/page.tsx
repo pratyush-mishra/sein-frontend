@@ -1,9 +1,12 @@
+"use client";
+import { useState, useEffect } from 'react';
 import InventoryClient from '@/components/inventory-client';
+import { Listing } from '@/app/api/Interfaces';
 
-async function fetchInventory() {
+async function fetchInventory(search: string = "", category: string = "") {
   try {
-    // Fetch inventory data from the backend (adjust endpoint as needed)
-    const res = await fetch('http://localhost:8000/api/listings/', { cache: 'no-store' });
+    const query = new URLSearchParams({ search, category }).toString();
+    const res = await fetch(`http://localhost:8000/api/listings/?${query}`, { cache: 'no-store' });
     if (!res.ok) return [];
     return await res.json();
   } catch {
@@ -11,7 +14,20 @@ async function fetchInventory() {
   }
 }
 
-export default async function InventoryPage() {
-  const listings = await fetchInventory();
-  return <InventoryClient listings={listings} />;
+export default function InventoryPage() {
+  const [listings, setListings] = useState<Listing[]>([]);
+
+  useEffect(() => {
+    fetchInventory().then(setListings);
+  }, []);
+
+  const handleSearch = (search: string) => {
+    fetchInventory(search).then(setListings);
+  };
+
+  const handleCategoryChange = (category: string) => {
+    fetchInventory("", category).then(setListings);
+  };
+
+  return <InventoryClient listings={listings} onSearch={handleSearch} onCategoryChange={handleCategoryChange} />;
 }

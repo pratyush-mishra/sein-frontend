@@ -14,18 +14,18 @@ export default function MessageOwnerButton({ listingId, ownerId, ownerUsername }
     setError("");
     setSuccess(false);
     try {
-      const token = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
+      const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
       if (!token) throw new Error("You must be logged in to send a message.");
       const res = await fetch("http://localhost:8000/api/messages/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Token ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          listing: listingId,
-          recipient: ownerId,
-          content,
+          listing_id: listingId,
+          content: content,
+          recipient_id: ownerId,
         }),
       });
       if (!res.ok) {
@@ -51,6 +51,7 @@ export default function MessageOwnerButton({ listingId, ownerId, ownerUsername }
           <ModalHeader>Message {ownerUsername}</ModalHeader>
           <ModalBody>
             <Textarea
+              size="lg"
               label="Message"
               placeholder="Ask about availability, pickup, etc."
               value={content}

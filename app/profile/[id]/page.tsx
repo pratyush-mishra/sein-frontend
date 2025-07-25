@@ -26,7 +26,6 @@ export default function ProfilePage(props: any) {
       setError("");
       try {
         const token = localStorage.getItem("authToken");
-        if (!token) throw new Error("Not authenticated");
         let url = "";
         if (id === "me") {
           url = "http://localhost:8000/auth/users/me/";

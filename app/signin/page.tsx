@@ -27,17 +27,29 @@ export default function AuthenticationPage() {
     setError("");
     setSuccess(false);
     try {
-      // Adjust the URL to match your Django backend login endpoint
-      
-     const data = await sign_in({email: form.email, password: form.password});
-      // Store token in localStorage (adjust key as needed)
-      if (data.auth_token) {
-        localStorage.setItem("authToken", data.auth_token);
-        setSuccess(true);
-        router.push("/profile");
-      } else {
-        throw new Error("No token received");
+      // Use Djoser JWT endpoint
+      const res = await fetch("http://localhost:8000/auth/jwt/create/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: form.email,
+          password: form.password,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.detail || "Login failed");
       }
+      const data = await res.json();
+      // Store tokens in localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('access_token', data.access);
+        localStorage.setItem('refresh_token', data.refresh);
+      }
+      router.push("/inventory");
+      window.dispatchEvent(new Event('authChange'));
     } catch (err: any) {
       setError(err.message || "Login failed");
     } finally {
