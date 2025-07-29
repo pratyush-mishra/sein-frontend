@@ -16,7 +16,7 @@ export default function InventoryClient({ listings, onSearch, onCategoryChange }
   useEffect(() => {
     async function fetchCategories() {
       try {
-        const res = await fetch('http://localhost:8000/api/listings/categories/');
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/listings/categories/`);
         if (res.ok) {
           const data = await res.json();
           setCategories(data);
@@ -54,22 +54,22 @@ export default function InventoryClient({ listings, onSearch, onCategoryChange }
         {(() => {
           // Define a palette of Tailwind color classes
           const colorClasses = [
-            "bg-pink-500 bg-opacity-70 hover:bg-pink-600 text-white text-md",
-            "bg-blue-500 bg-opacity-70 hover:bg-blue-600 text-white text-md",
-            "bg-green-500 bg-opacity-70 hover:bg-green-600 text-white text-md",
-            "bg-yellow-500 bg-opacity-70 hover:bg-yellow-600 text-white text-md",
-            "bg-purple-500 bg-opacity-70 hover:bg-purple-600 text-white text-md",
-            "bg-red-500 bg-opacity-70 hover:bg-red-600 text-white text-md",
-            "bg-teal-500 bg-opacity-70 hover:bg-teal-600 text-white text-md",
-            "bg-orange-500 bg-opacity-70 hover:bg-orange-600 text-white text-md",
-            "bg-indigo-500 bg-opacity-70 hover:bg-indigo-600 text-white text-md",
-            "bg-cyan-500 bg-opacity-70 hover:bg-cyan-600 text-white text-md",
+            "bg-pink-500 bg-opacity-70 hover:bg-pink-600 text-grey text-md",
+            "bg-blue-500 bg-opacity-70 hover:bg-blue-600 text-grey text-md",
+            "bg-green-500 bg-opacity-70 hover:bg-green-600 text-grey text-md",
+            "bg-yellow-500 bg-opacity-70 hover:bg-yellow-600 text-grey text-md",
+            "bg-purple-500 bg-opacity-70 hover:bg-purple-600 text-grey text-md",
+            "bg-red-500 bg-opacity-70 hover:bg-red-600 text-grey text-md",
+            "bg-teal-500 bg-opacity-70 hover:bg-teal-600 text-grey text-md",
+            "bg-orange-500 bg-opacity-70 hover:bg-orange-600 text-grey text-lg",
+            "bg-indigo-500 bg-opacity-70 hover:bg-indigo-600 text-grey text-lg",
+            "bg-cyan-500 bg-opacity-70 hover:bg-cyan-600 text-grey text-lg",
           ];
           return (
             <>
               <Button
                 onClick={() => onCategoryChange("")}
-                size="sm"
+                size="lg" radius="full"
                 className={colorClasses[0] + " font-semibold transition-colors duration-200"}
               >
                 All
@@ -78,7 +78,7 @@ export default function InventoryClient({ listings, onSearch, onCategoryChange }
                 <Button
                   key={value}
                   onClick={() => onCategoryChange(value)}
-                  size="sm"
+                  size="lg" radius="full"
                   className={
                     colorClasses[(idx + 1) % colorClasses.length] +
                     " font-semibold transition-colors duration-200"

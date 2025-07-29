@@ -39,13 +39,13 @@ export default function MessagesClient({ initialMessages }: MessagesClientProps)
       const token = localStorage.getItem("access_token");
       let res;
       if (token) {
-        res = await fetch("http://localhost:8000/api/messages/", {
+        res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/messages/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
       } else {
-        res = await fetch("http://localhost:8000/api/messages/");
+        res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/messages/`);
       }
       if (res.status === 401) throw new Error("You must be logged in to view messages.");
       if (!res.ok) {
@@ -71,7 +71,7 @@ export default function MessagesClient({ initialMessages }: MessagesClientProps)
       try {
         const token = localStorage.getItem("access_token");
         if (!token) return;
-        const res = await fetch("http://localhost:8000/auth/users/me/", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/users/me/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -253,7 +253,7 @@ export default function MessagesClient({ initialMessages }: MessagesClientProps)
                       recipientId = lastSenderId;
                     }
                     if (!recipientId) throw new Error("Could not determine recipient.");
-                    const res = await fetch("http://localhost:8000/api/messages/", {
+                    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/messages/`, {
                       method: "POST",
                       headers: {
                         "Content-Type": "application/json",

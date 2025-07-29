@@ -5,6 +5,7 @@ import { Card } from "@heroui/card";
 import { Textarea } from "@heroui/input"
 import { title } from "@/components/primitives";
 import { sign_up } from "../api/auth/login/route";
+import TermsAndConditions from "@/components/terms-and-conditions";
 export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [re_password, setRePassword] = useState("");
@@ -80,8 +81,16 @@ export default function SignupPage() {
         body: formData,
       });
       if (!res.ok) {
-        const data = await res.json();
-        setErrors(data);
+        try {
+          const data = await res.json();
+          // Map known backend errors to the 'errors' state.
+          // For unknown errors, use a generic message.
+          const newErrors = { ...data, general: data.detail || "An unknown error occurred." };
+          setErrors(newErrors);
+        } catch (jsonError) {
+          // The response was not valid JSON.
+          setErrors({ general: "Signup failed. Please try again later." });
+        }
         setLoading(false);
         return;
       }
@@ -169,6 +178,7 @@ export default function SignupPage() {
             className="rounded-lg border border-default-200 p-2 text-default-700 focus:outline-none focus:ring-2 focus:ring-primary"
             onChange={e => setProfilePicture(e.target.files ? e.target.files[0] : null)}
           />
+          <TermsAndConditions />
           <Button type="submit" color="primary" isLoading={loading} >
             Sign Up
           </Button>

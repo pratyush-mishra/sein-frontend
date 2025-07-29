@@ -20,7 +20,7 @@ export const Navbar = () => {
           setIsLoggedIn(false);
           return;
         }
-        const res = await fetch("http://localhost:8000/auth/users/me/", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/users/me/`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },

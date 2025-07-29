@@ -16,7 +16,7 @@ export default function MessageOwnerButton({ listingId, ownerId, ownerUsername }
     try {
       const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
       if (!token) throw new Error("You must be logged in to send a message.");
-      const res = await fetch("http://localhost:8000/api/messages/", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/messages/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

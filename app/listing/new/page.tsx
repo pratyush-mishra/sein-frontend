@@ -6,6 +6,7 @@ import { Textarea } from "@heroui/input"
 import { Input } from "@heroui/input";
 import { Form, Radio, RadioGroup, NumberInput, Dropdown, DropdownTrigger, Button, DropdownMenu, DropdownItem, Select, SelectItem, Skeleton, Modal, ModalBody, ModalContent, ModalHeader, ModalFooter, useDisclosure } from "@heroui/react";
 import  ImageUpload from "@/components/image-upload";
+import {useAuth} from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 
 export default function ListingPage() {
@@ -14,7 +15,6 @@ export default function ListingPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
-    const [isPageLoading, setIsPageLoading] = useState(true);
     const availability = [
         {key:"pickup", label:"Available for Pick Up"},
         {key:"dropoff", label:"Available for Drop Off"},
@@ -29,11 +29,7 @@ export default function ListingPage() {
     ];
     const router = useRouter();
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
-    useEffect(() => {
-        // Simulate loading for skeleton
-        const timeout = setTimeout(() => setIsPageLoading(false), 600);
-        return () => clearTimeout(timeout);
-    }, [router]);
+    const { isLoading: isAuthLoading, isAuthenticated } = useAuth({ required: true });
     const handleImagesChange = (files: File[]) => {
         setSelectedImages(files);
     };
@@ -58,7 +54,7 @@ export default function ListingPage() {
             // Set fee boolean and value
             formData.set("is_fee", isFee === "yes" ? "true" : "false");
             // Send to backend (adjust URL as needed)
-            const res = await fetch("http://localhost:8000/api/listings/", {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/listings/`, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -79,7 +75,7 @@ export default function ListingPage() {
             setLoading(false);
         }
     };
-  if (isPageLoading) {
+  if (isAuthLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-10 px-4">
         <h1 className={title()}><Skeleton className="h-10 w-64 rounded mb-4" /></h1>
@@ -90,7 +86,7 @@ export default function ListingPage() {
       </div>
     );
   }
-  return (
+  return isAuthenticated && (
      <div className="flex flex-col items-center justify-center py-10">
             <h1 className={title()}>Share a new Resource</h1>
             <Card className="w-full max-w-4xl mt-8 p-6">
@@ -238,6 +234,5 @@ export default function ListingPage() {
                 </Form>
             </Card>
         </div>
-  
   );
 }

@@ -2,55 +2,54 @@
 import { useEffect, useState, useRef } from "react";
 import { Input, Textarea, Button, Skeleton, Modal, ModalBody, ModalContent, ModalHeader, ModalFooter, useDisclosure } from "@heroui/react";
 import { title } from "@/components/primitives";
+import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState("");
   const [editSuccess, setEditSuccess] = useState(false);
   const [previewPic, setPreviewPic] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen: isDeleteModalOpen, onOpen: onDeleteModalOpen, onOpenChange: onDeleteModalOpenChange } = useDisclosure();
   const [listings, setListings] = useState<any[]>([]);
+  const [listingToDelete, setListingToDelete] = useState<any>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
   const router = useRouter();
+  const { user: authUser, isLoading, error } = useAuth({ required: true });
 
   useEffect(() => {
-    async function fetchUser() {
-      setLoading(true);
-      setError("");
-      try {
-        const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-        if (!token) throw new Error("Not authenticated");
-        const res = await fetch("http://localhost:8000/auth/users/me/", {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-        if (!res.ok) throw new Error("Not authenticated");
-        const data = await res.json();
-        setUser(data);
-        // Fetch all listings and filter for current user
-        const listingsRes = await fetch("http://localhost:8000/api/listings/", {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-        if (listingsRes.ok) {
-          const allListings = await listingsRes.json();
-          const userListings = allListings.filter((l: any) => l.owner && l.owner.id === data.id && l.is_approved);
-          setListings(userListings);
+    if (authUser) {
+      setUser(authUser);
+    }
+  }, [authUser]);
+
+  useEffect(() => {
+    async function fetchListings() {
+      if (user) {
+        try {
+          const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+          if (!token) return;
+          const listingsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/listings/`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+          if (listingsRes.ok) {
+            const allListings = await listingsRes.json();
+            const userListings = allListings.filter((l: any) => l.owner && l.owner.id === user.id && l.is_approved);
+            setListings(userListings);
+          }
+        } catch (err) {
+          console.error("Failed to fetch listings:", err);
         }
-      } catch (err: any) {
-        setError(err.message || "Failed to fetch user");
-      } finally {
-        setLoading(false);
       }
     }
-    fetchUser();
-  }, []);
+    fetchListings();
+  }, [user]);
 
   // Handle edit form submit
   async function handleEditSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -62,7 +61,7 @@ export default function ProfilePage() {
       const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
       if (!token) throw new Error("Not authenticated");
       const formData = new FormData(e.currentTarget); // Ensure formData is defined
-      const res = await fetch("http://localhost:8000/auth/users/me/", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/users/me/`, {
         method: "PATCH",
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -84,6 +83,35 @@ export default function ProfilePage() {
     }
   }
 
+  async function handleDeleteListing() {
+    if (!listingToDelete) return;
+    setDeleteLoading(true);
+    setDeleteError("");
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+      if (!token) throw new Error("Not authenticated");
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/listings/${listingToDelete.id}/`, {
+        method: "DELETE",
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.detail || "Failed to delete listing.");
+      }
+      setListings(prevListings => prevListings.filter(l => l.id !== listingToDelete.id));
+      onDeleteModalOpenChange();
+      setListingToDelete(null);
+    } catch (err: any) {
+      setDeleteError(err.message);
+    } finally {
+      setDeleteLoading(false);
+    }
+  }
+
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (file) {
@@ -95,7 +123,7 @@ export default function ProfilePage() {
     }
   }
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-10 px-4">
         <h1 className={title()}><Skeleton className="h-10 w-64 rounded mb-4" /></h1>
@@ -115,6 +143,10 @@ export default function ProfilePage() {
 
   if (error) {
     return <div className="text-center text-danger mt-8">{error}</div>;
+  }
+
+  if (!user) {
+    return null; // Or a different loader, but isLoading should handle it.
   }
 
   return (
@@ -159,9 +191,18 @@ export default function ProfilePage() {
                     <p className="text-default-600">{listing.description}</p>
                   </div>
                 </div>
-                <Button color="primary" className="mt-2 w-fit" onPress={() => router.push(`/listing/edit/${listing.id}`)}>
-                  Edit Listing
-                </Button>
+                <div className="flex items-center gap-2 mt-2">
+                  <Button color="primary" className="w-fit" onPress={() => router.push(`/listing/edit/${listing.id}`)}>
+                    Edit Listing
+                  </Button>
+                  <Button
+                    color="danger"
+                    variant="bordered"
+                    className="w-fit"
+                    onPress={() => { setListingToDelete(listing); onDeleteModalOpen(); }}>
+                    Delete Listing
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
@@ -241,6 +282,25 @@ export default function ProfilePage() {
               </Button>
             </ModalFooter>
           </form>
+        </ModalContent>
+      </Modal>
+      {/* Delete Confirmation Modal */}
+      <Modal isOpen={isDeleteModalOpen} onOpenChange={onDeleteModalOpenChange} placement="center">
+        <ModalContent>
+          <ModalHeader>Confirm Deletion</ModalHeader>
+          <ModalBody>
+            <p>Are you sure you want to delete the listing: <strong>{listingToDelete?.title}</strong>?</p>
+            <p className="text-sm text-danger mt-2">This action cannot be undone.</p>
+            {deleteError && <div className="text-danger text-xs mt-2">{deleteError}</div>}
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="light" onPress={onDeleteModalOpenChange} type="button">
+              Cancel
+            </Button>
+            <Button color="danger" onPress={handleDeleteListing} isLoading={deleteLoading}>
+              Delete
+            </Button>
+          </ModalFooter>
         </ModalContent>
       </Modal>
     </div>
