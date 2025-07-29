@@ -54,13 +54,13 @@ export default function InventoryClient({ listings, onSearch, onCategoryChange }
         {(() => {
           // Define a palette of Tailwind color classes
           const colorClasses = [
-            "bg-pink-500 bg-opacity-70 hover:bg-pink-600 text-grey text-md",
-            "bg-blue-500 bg-opacity-70 hover:bg-blue-600 text-grey text-md",
-            "bg-green-500 bg-opacity-70 hover:bg-green-600 text-grey text-md",
-            "bg-yellow-500 bg-opacity-70 hover:bg-yellow-600 text-grey text-md",
-            "bg-purple-500 bg-opacity-70 hover:bg-purple-600 text-grey text-md",
-            "bg-red-500 bg-opacity-70 hover:bg-red-600 text-grey text-md",
-            "bg-teal-500 bg-opacity-70 hover:bg-teal-600 text-grey text-md",
+            "bg-pink-500 bg-opacity-70 hover:bg-pink-600 text-grey text-lg",
+            "bg-blue-500 bg-opacity-70 hover:bg-blue-600 text-grey text-lg",
+            "bg-green-500 bg-opacity-70 hover:bg-green-600 text-grey text-lg",
+            "bg-yellow-500 bg-opacity-70 hover:bg-yellow-600 text-grey text-lg",
+            "bg-purple-500 bg-opacity-70 hover:bg-purple-600 text-grey text-lg",
+            "bg-red-500 bg-opacity-70 hover:bg-red-600 text-grey text-lg",
+            "bg-teal-500 bg-opacity-70 hover:bg-teal-600 text-grey text-lg",
             "bg-orange-500 bg-opacity-70 hover:bg-orange-600 text-grey text-lg",
             "bg-indigo-500 bg-opacity-70 hover:bg-indigo-600 text-grey text-lg",
             "bg-cyan-500 bg-opacity-70 hover:bg-cyan-600 text-grey text-lg",

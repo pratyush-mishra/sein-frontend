@@ -1,10 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Card } from "@heroui/card";
-import { Skeleton, Input } from "@heroui/react";
+import { Skeleton, Input, Button } from "@heroui/react";
 import { title } from "@/components/primitives";
 import { Message, MessagesClientProps } from "@/app/api/Interfaces";
-import { SearchIcon } from "@/components/icons";
+import { useAuth } from "@/hooks/useAuth";
 
 function getListingId(listing: any): number | undefined {
   if (typeof listing === 'object' && listing !== null && 'id' in listing) return listing.id;
@@ -23,33 +23,30 @@ function getListingTags(listing: any): string[] {
 
 export default function MessagesClient({ initialMessages }: MessagesClientProps) {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
-  const [loading, setLoading] = useState(true);
+  const [messagesLoading, setMessagesLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedListingId, setSelectedListingId] = useState<number | undefined>(undefined);
-  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [search, setSearch] = useState("");
   const [replyContent, setReplyContent] = useState("");
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState("");
+  const { user: authUser, isLoading: isAuthLoading, isAuthenticated, error: authError } = useAuth({ required: true });
+  const currentUserId = authUser?.id;
 
   async function fetchMessages(selectedId?: number) {
-    setLoading(true);
+    setMessagesLoading(true);
     setError("");
     try {
       const token = localStorage.getItem("access_token");
-      let res;
-      if (token) {
-        res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/messages/`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-      } else {
-        res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/messages/`);
-      }
-      if (res.status === 401) throw new Error("You must be logged in to view messages.");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/messages/`, {
+        headers: {
+          // The token is guaranteed to exist here because of the `useAuth` hook.
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!res.ok) {
-        throw new Error("Failed to fetch messages");
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.detail || "Failed to fetch messages");
       }
       const data = await res.json();
       setMessages(data);
@@ -61,31 +58,16 @@ export default function MessagesClient({ initialMessages }: MessagesClientProps)
     } catch (err: any) {
       setError(err.message || "Failed to fetch messages");
     } finally {
-      setLoading(false);
+      setMessagesLoading(false);
     }
   }
 
   useEffect(() => {
-    fetchMessages();
-    async function fetchCurrentUser() {
-      try {
-        const token = localStorage.getItem("access_token");
-        if (!token) return;
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/users/me/`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (!res.ok) return;
-        const data = await res.json();
-        setCurrentUserId(data.id);
-      } catch {
-        // ignore
-      }
+    if (isAuthenticated) {
+      fetchMessages();
     }
-    fetchCurrentUser();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isAuthenticated]);
 
   // Group messages by listing
   const listingMap: Record<number, { title: string; tags: string[]; messages: Message[] }> = {};
@@ -138,7 +120,7 @@ export default function MessagesClient({ initialMessages }: MessagesClientProps)
   return (
     <div>
       <h1 className={title()}>Messages</h1>
-      {loading && (
+      {(isAuthLoading || messagesLoading) && (
         <div className="flex flex-col md:flex-row gap-6 mt-8 min-h-[400px]">
           {/* Left: Listing Overview Skeleton */}
           <div className="md:w-1/3 w-full border-r border-default-200 pr-0 md:pr-4 mb-6 md:mb-0">
@@ -160,8 +142,8 @@ export default function MessagesClient({ initialMessages }: MessagesClientProps)
           </div>
         </div>
       )}
-      {error && <div className="text-center text-danger mt-8">{error}</div>}
-      {!loading && !error && (
+      {(authError || error) && <div className="text-center text-danger mt-8">{authError || error}</div>}
+      {isAuthenticated && !isAuthLoading && !messagesLoading && !error && (
         <div className="flex flex-col md:flex-row gap-6 mt-8 min-h-[400px]">
           {/* Left: Listing Overview */}
           <div className="md:w-1/3 w-full border-r border-default-200 pr-0 md:pr-4 mb-6 md:mb-0">
@@ -289,13 +271,15 @@ export default function MessagesClient({ initialMessages }: MessagesClientProps)
                   required
                 />
                 {sendError && <div className="text-danger text-xs">{sendError}</div>}
-                <button
+                <Button
                   type="submit"
-                  className="self-end bg-primary text-white px-4 py-2 rounded"
-                  disabled={sending || !replyContent.trim()}
+                  color="primary"
+                  className="self-end"
+                  isLoading={sending}
+                  isDisabled={!replyContent.trim()}
                 >
-                  {sending ? "Sending..." : "Send"}
-                </button>
+                  Send
+                </Button>
               </form>
               </>
             )}

@@ -38,7 +38,7 @@ export default function EditListingPage() {
       try {
         const token = localStorage.getItem("access_token");
         // TODO
-        const res = await fetch(`http://localhost:8000/api/listings/${id}/`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/listings/${id}/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -81,7 +81,7 @@ export default function EditListingPage() {
       formData.set("is_fee", isFee === "yes" ? "true" : "false");
       // Send PATCH to backend
       const token = localStorage.getItem("access_token");
-      const res = await fetch(`http://localhost:8000/api/listings/${id}/`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/listings/${id}/`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,

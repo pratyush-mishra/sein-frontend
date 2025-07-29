@@ -3,7 +3,6 @@ import { useEffect, useState, useRef } from "react";
 import { Input, Textarea, Button, Skeleton, Modal, ModalBody, ModalContent, ModalHeader, ModalFooter, useDisclosure } from "@heroui/react";
 import { title } from "@/components/primitives";
 import { useRouter, useParams } from "next/navigation";
-import ListingDetailClient from '@/components/listing-detail-client';
 
 export default function ProfilePage(props: any) {
   const params = useParams();
@@ -28,9 +27,9 @@ export default function ProfilePage(props: any) {
         const token = localStorage.getItem("authToken");
         let url = "";
         if (id === "me") {
-          url = "http://localhost:8000/auth/users/me/";
+          url = `${process.env.NEXT_PUBLIC_API_URL}/auth/users/me/`;
         } else {
-          url = `http://localhost:8000/api/users/${id}/`;
+          url = `${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}/`;
         }
         const res = await fetch(url, {
           headers: { Authorization: `Token ${token}` },
@@ -42,7 +41,7 @@ export default function ProfilePage(props: any) {
         if (id === "me" || (data && data.id && localStorage.getItem("userId") && String(data.id) === localStorage.getItem("userId"))) {
           setIsCurrentUser(true);
           // Fetch current user's listings
-          const listingsRes = await fetch("http://localhost:8000/api/listings/my/", {
+          const listingsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/listings/my/`, {
             headers: { Authorization: `Token ${token}` },
           });
           if (listingsRes.ok) {
@@ -73,7 +72,7 @@ export default function ProfilePage(props: any) {
       if (!formData.get("profile_picture")) {
         formData.delete("profile_picture");
       }
-      const res = await fetch("http://localhost:8000/auth/users/me/", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/users/me/`, {
         method: "PATCH",
         headers: {
           Authorization: `Token ${token}`,

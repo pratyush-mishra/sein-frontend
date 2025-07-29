@@ -6,7 +6,7 @@ import { Listing } from '@/app/api/Interfaces';
 async function fetchInventory(search: string = "", category: string = "") {
   try {
     const query = new URLSearchParams({ search, category }).toString();
-    const res = await fetch(`http://localhost:8000/api/listings/?${query}`, { cache: 'no-store' });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/listings/?${query}`, { cache: 'no-store' });
     if (!res.ok) return [];
     return await res.json();
   } catch {

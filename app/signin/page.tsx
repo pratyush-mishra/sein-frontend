@@ -28,7 +28,7 @@ export default function AuthenticationPage() {
     setSuccess(false);
     try {
       // Use Djoser JWT endpoint
-      const res = await fetch("http://localhost:8000/auth/jwt/create/", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/jwt/create/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
