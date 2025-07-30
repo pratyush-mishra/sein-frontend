@@ -78,6 +78,7 @@ export default function ListingDetailClient({ listing, ownerId, ownerUsername }:
               <div className="relative w-full max-w-[32rem] h-[28rem] flex items-center justify-center">
                 <img
                   src={listing.images?.[currentImageIdx]?.image || "/default-profile.png"}
+                  alt=""
                   className="w-full h-[36rem] max-w-[48rem] object-cover rounded-2xl shadow-2xl border-4 border-primary"
                 />
                 {listing.images?.length > 1 && (
@@ -113,7 +114,7 @@ export default function ListingDetailClient({ listing, ownerId, ownerUsername }:
           ) : (
             <img
               src="/default-profile.png"
-              alt="No image"
+              alt=""
               className="w-full h-[36rem] max-w-[48rem] object-cover rounded-2xl shadow-2xl border-4 border-primary"
             />
           )}

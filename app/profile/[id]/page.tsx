@@ -136,6 +136,7 @@ export default function ProfilePage(props: any) {
           <img
             src={user.profile_picture || "/default-profile.png"}
             className="w-32 h-32 rounded-full object-cover border-4 border-primary"
+            alt=""
           />
           <div className="text-center md:text-left">
             <h2 className="text-2xl font-semibold mb-1">{user.username}</h2>
