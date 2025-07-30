@@ -110,10 +110,10 @@ export default function SignupPage() {
         <Form onSubmit={onSubmit} className="flex flex-col gap-4" encType="multipart/form-data" validationErrors={errors} onReset={() => setSubmitted(null)}>
           <Input
             isRequired
-            label="Username"
+            label="Organisation Name"
             labelPlacement="outside"
             name="username"
-            placeholder="Enter your username"
+            placeholder="Enter the name of your organisation"
             errorMessage={errors.username}
           />
           <Input
@@ -179,6 +179,7 @@ export default function SignupPage() {
             onChange={e => setProfilePicture(e.target.files ? e.target.files[0] : null)}
           />
           <TermsAndConditions />
+          <Checkbox> I accept the terms and conditions of using this platform</Checkbox> 
           <Button type="submit" color="primary" isLoading={loading} >
             Sign Up
           </Button>

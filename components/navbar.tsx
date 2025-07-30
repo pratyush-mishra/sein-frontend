@@ -89,7 +89,7 @@ export const Navbar = () => {
               <li><NextLink href="/" className="hover:underline underline-offset-4">Home</NextLink></li>
               <li><NextLink href="/inventory" className="hover:underline underline-offset-4">Inventory</NextLink></li>
               <li><NextLink href="/signin" className="hover:underline underline-offset-4">Sign In</NextLink></li>
-              <li><NextLink href="/contact" className="hover:underline underline-offset-4">Contact</NextLink></li>
+              <li><NextLink href="/privacy-policy" className="hover:underline underline-offset-4">Terms</NextLink></li>
             </>
           )}
         </ul>
@@ -135,7 +135,7 @@ export const Navbar = () => {
                 <li><NextLink href="/" onClick={() => setMenuOpen(false)}>Home</NextLink></li>
                 <li><NextLink href="/inventory" onClick={() => setMenuOpen(false)}>Inventory <span className="ml-2">&gt;</span></NextLink></li>
                 <li><NextLink href="/signin" onClick={() => setMenuOpen(false)}>Sign In <span className="ml-2">&gt;</span></NextLink></li>
-                <li><NextLink href="/contact" onClick={() => setMenuOpen(false)}>Contact</NextLink></li>
+                <li><NextLink href="/privacy-policy" onClick={() => setMenuOpen(false)}>Terms</NextLink></li>
               </>
             )}
           </ul>
