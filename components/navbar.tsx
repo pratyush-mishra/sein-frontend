@@ -64,7 +64,7 @@ export const Navbar = () => {
         {/* Logo */}
         <div className="flex items-center gap-4">
           <NextLink href="/" className="flex items-center gap-3">
-            <img src="/SEIN.png" alt="SEIN Logo" className="h-36 w-36 rounded-full bg-white p-2" />
+            <img src="/SEIN.png" alt="SEIN" className="h-36 w-36 rounded-full bg-white p-2" />
           </NextLink>
         </div>
         {/* Desktop Menu */}
@@ -110,7 +110,7 @@ export const Navbar = () => {
           {/* Top: Logo and Close */}
           <div className="flex w-full items-center justify-between px-8 mb-8">
             <NextLink href="/" className="flex items-center gap-3" onClick={() => setMenuOpen(false)}>
-              <img src="/SEIN.png" alt="SEIN Logo" className="h-16 w-16 rounded-full bg-white p-2" />
+              <img src="/SEIN.png" alt="SEIN" className="h-16 w-16 rounded-full bg-white p-2" />
             </NextLink>
             <button
               className="text-3xl focus:outline-none"

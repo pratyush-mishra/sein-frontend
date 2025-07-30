@@ -135,7 +135,6 @@ export default function ProfilePage(props: any) {
         <div className="flex flex-col items-center md:items-start gap-4 w-full md:w-1/3">
           <img
             src={user.profile_picture || "/default-profile.png"}
-            alt={user.username}
             className="w-32 h-32 rounded-full object-cover border-4 border-primary"
           />
           <div className="text-center md:text-left">

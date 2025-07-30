@@ -110,7 +110,6 @@ export default function InventoryClient({ listings, onSearch, onCategoryChange }
                     <div className="w-full aspect-[4/3] bg-gray-100 rounded-t-lg overflow-hidden">
                       <img
                         src={listing.images[0].image}
-                        alt={listing.title}
                         className="w-full h-full object-cover"
                       />
                     </div>

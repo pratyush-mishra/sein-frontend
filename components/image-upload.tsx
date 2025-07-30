@@ -178,7 +178,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                   <div key={index} className="relative group">
                     <Image
                       src={preview}
-                      alt={`Preview ${index + 1}`}
                       className="w-full h-32 object-cover rounded-lg"
                     />
                     <Button
