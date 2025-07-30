@@ -12,7 +12,7 @@ export default function TermsAndConditions() {
           <ModalBody>
             <p>Last Updated: 29 July 2025</p>
             <p>
-              Welcome to SEIN’s Resource Hub! By using the Resource Hub, you agree to the following terms of use. These terms of use may change occasionally and the date listed above will be updated. It's your responsibility to review these terms for any changes and your use of Resource Hub implies your agreement to the current terms of use published here.
+              Welcome to SEIN&rsquo;ss Resource Hub! By using the Resource Hub, you agree to the following terms of use. These terms of use may change occasionally and the date listed above will be updated. It is your responsibility to review these terms for any changes and your use of Resource Hub implies your agreement to the current terms of use published here.
             </p>
             <p><b>Privacy Policy</b></p>
             <p>
@@ -32,7 +32,7 @@ export default function TermsAndConditions() {
             Further, you agree that the Resource Hub is made available for your personal or organisation use only.
             You also take sole responsibility for anything you post on the Resource Hub and understand that SEIN makes no guarantees as to the accuracy or validity of submissions made by others.</p>
             <p><b>Interactions</b></p>
-            <p>By using the Resource Hub, you are able to interact with other people. You take sole responsibility for all your interactions with others on the Resource Hub. SEIN does not moderate submissions or interactions, so it's up to each individual using the site to judge the accuracy, integrity, and quality of others and their submissions</p>
+            <p>By using the Resource Hub, you are able to interact with other people. You take sole responsibility for all your interactions with others on the Resource Hub. SEIN does not moderate submissions or interactions, so it is up to each individual using the site to judge the accuracy, integrity, and quality of others and their submissions</p>
             <p>SEIN asks that all members be guided by our agreements in the SEIN member’s handbook.  We reserve the right to end use of the site for anyone who violates the terms and conditions outlined in the handbook.</p>
             <p><b>Responsibilities and Liability</b></p>
             <p>SEIN does not own, inspect, or guarantee the condition of shared items. All transactions are at users’ own risk. We are not liable for loss, damage, theft, or personal injury arising from shared items.</p>
