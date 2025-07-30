@@ -189,7 +189,7 @@ export default function SignupPage() {
             <ModalContent>
               <ModalHeader>Signup Request Created</ModalHeader>
               <ModalBody>
-                Thanks for signing up. Please wait while we review your details. You'll get an email once your account is approved.
+                Thanks for signing up. Please wait while we review your details. You will get an email once your account is approved.
               </ModalBody>
               <ModalFooter>
                 <Button color="primary" onPress={onOpenChange}>

@@ -89,7 +89,7 @@ export default function AuthenticationPage() {
           </Button>
         </form>
         <div className="mt-4 text-center">
-          <span className="text-default-600">Don't have an account?</span>
+          <span className="text-default-600">Don&apos;t have an account?</span>
           <Button
             variant="light"
             color="primary"

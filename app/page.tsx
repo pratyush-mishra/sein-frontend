@@ -15,7 +15,7 @@ export default function Home() {
             Lend and share resources with other SEIN members.
           </span>
           <div className={subtitle({ class: "mt-4" })}>
-            SEIN's Resource Hub lets you share resources with other member organisations to encourage a circular economy between the community and help reduce consumption.
+            SEIN&apos;s Resource Hub lets you share resources with other member organisations to encourage a circular economy between the community and help reduce consumption.
           </div>
         </div>  
 

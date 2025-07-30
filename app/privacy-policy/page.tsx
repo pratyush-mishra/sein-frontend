@@ -18,7 +18,7 @@ export default function PolicyPage() {
                 <li>Contact details</li>
             </ul>
             <p className="mb-4">
-                We don't sell, rent, or lend personal information to anyone under any circumstances.
+                We don&apos;t sell, rent, or lend personal information to anyone under any circumstances.
             </p>
             <p className="mb-4">
                 You can request to remove your account and any personally identifying information you provided by reaching out to us directly.

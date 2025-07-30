@@ -221,7 +221,7 @@ export default function ListingPage() {
                         <ModalContent>
                           <ModalHeader>Submission Received</ModalHeader>
                           <ModalBody>
-                            Thank you for sharing your resource. We will now review it to make sure it meets our community guidelines. You'll get a once it gets approved and visible to other members!
+                            Thank you for sharing your resource. We will now review it to make sure it meets our community guidelines. You&apos;ll get a once it gets approved and visible to other members!
                           </ModalBody>
                           <ModalFooter>
                             <Button color="primary" onPress={onOpenChange}>
