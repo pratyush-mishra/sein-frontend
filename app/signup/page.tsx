@@ -4,7 +4,6 @@ import { Form, Input, Select, SelectItem, Checkbox, Button, form, Modal, ModalBo
 import { Card } from "@heroui/card";
 import { Textarea } from "@heroui/input"
 import { title } from "@/components/primitives";
-import { sign_up } from "../api/auth/login/route";
 import TermsAndConditions from "@/components/terms-and-conditions";
 export default function SignupPage() {
   const [password, setPassword] = useState("");

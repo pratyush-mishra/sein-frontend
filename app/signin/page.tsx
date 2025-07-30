@@ -5,7 +5,6 @@ import { Button } from "@heroui/button";
 import { Card } from "@heroui/card";
 import { title } from "@/components/primitives";
 import { useRouter } from "next/navigation";
-import { sign_in } from "../api/auth/login/route";
 export default function AuthenticationPage() {
   const [form, setForm] = useState({
     email: "",
