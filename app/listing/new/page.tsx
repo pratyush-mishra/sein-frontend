@@ -199,6 +199,7 @@ export default function ListingPage() {
                                 labelPlacement="outside"
                                 maxRows={2}
                                 placeholder="Please give collection times, location and other contact details for this listing."
+                                isRequired
                                 size="lg"
                             />
                         </div>

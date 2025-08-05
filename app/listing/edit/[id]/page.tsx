@@ -208,6 +208,15 @@ export default function EditListingPage() {
                   <SelectItem key={cat.key}>{cat.label}</SelectItem>
                 ))}
               </Select>
+              <Textarea
+                label="Contact Details"
+                name="contact_details"
+                labelPlacement="outside"
+                maxRows={2}
+                placeholder="Please give collection times, location and other contact details for this listing."
+                isRequired
+                size="lg"
+              />
             </div>
             {/* Right Column - Image Upload */}
             <div className="flex flex-col gap-4">
