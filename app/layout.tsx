@@ -39,7 +39,7 @@ export default function RootLayout({
           "min-h-screen text-foreground bg-background font-sans antialiased bg-art-repeat",
           fontSans.variable
         )}
-      >
+      > <Analytics />
         <Providers>
           <div className="relative flex flex-col h-screen">
             <Navbar />
