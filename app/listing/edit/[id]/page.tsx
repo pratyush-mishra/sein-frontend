@@ -215,7 +215,7 @@ export default function EditListingPage() {
                 maxRows={2}
                 placeholder="Please give collection times, location and other contact details for this listing."
                 isRequired
-                size="lg"
+                defaultValue={listing?.contact_details || ""}
               />
             </div>
             {/* Right Column - Image Upload */}

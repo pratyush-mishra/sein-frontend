@@ -2,8 +2,10 @@
 import { useState, useEffect } from 'react';
 import InventoryClient from '@/components/inventory-client';
 import { Listing } from '@/app/api/Interfaces';
+import { useAuth } from "@/hooks/useAuth";
 
 async function fetchInventory(search: string = "", category: string = "") {
+  
   try {
     const query = new URLSearchParams({ search, category }).toString();
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/listings/?${query}`, { cache: 'no-store' });
@@ -16,6 +18,16 @@ async function fetchInventory(search: string = "", category: string = "") {
 
 export default function InventoryPage() {
   const [listings, setListings] = useState<Listing[]>([]);
+  const [user, setUser] = useState<any>(null);
+  const { user: authUser, isLoading, error } = useAuth({ required: true });
+  
+  
+  
+  useEffect(() => {
+    if (authUser) {
+      setUser(authUser);
+    }
+  }, [authUser]);
 
   useEffect(() => {
     fetchInventory().then(setListings);
