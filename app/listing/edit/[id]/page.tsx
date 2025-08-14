@@ -76,9 +76,8 @@ export default function EditListingPage() {
 
     try {
       const token = localStorage.getItem("access_token");
-      // This assumes your API has an endpoint at /api/images/{id}/ to delete an image.
-      // You may need to adjust this URL based on your backend's routing.
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/images/${imageId}/`, {
+      // DELETE request to delete an image.
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/listings/${id}/images/${imageId}/`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
