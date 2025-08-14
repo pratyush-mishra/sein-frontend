@@ -241,7 +241,7 @@ export default function EditListingPage() {
                     ? Array.isArray(listing.availability)
                       ? listing.availability
                       : typeof listing.availability === 'string'
-                      ? listing.availability.split(',').map(s => s.trim())
+                      ? listing.availability.split(',').map((s: string) => s.trim())
                       : []
                     : []
                 }
@@ -270,7 +270,7 @@ export default function EditListingPage() {
                     ? Array.isArray(listing.category)
                       ? listing.category
                       : typeof listing.category === 'string'
-                      ? listing.category.split(',').map(s => s.trim())
+                      ? listing.category.split(',').map((s: string) => s.trim())
                       : []
                     : []
                 }
