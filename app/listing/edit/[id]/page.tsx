@@ -236,7 +236,15 @@ export default function EditListingPage() {
                 name="availability"
                 placeholder="Select availability"
                 selectionMode="multiple"
-                defaultSelectedKeys={listing?.availability ? listing.availability.split(",") : []}
+                defaultSelectedKeys={
+                  listing?.availability
+                    ? Array.isArray(listing.availability)
+                      ? listing.availability
+                      : typeof listing.availability === 'string'
+                      ? listing.availability.split(',').map(s => s.trim())
+                      : []
+                    : []
+                }
               >
                 {availability.map((availability) => (
                   <SelectItem key={availability.key}>{availability.label}</SelectItem>
@@ -257,7 +265,15 @@ export default function EditListingPage() {
                 placeholder="Select category"
                 selectionMode="multiple"
                 isRequired
-                defaultSelectedKeys={listing?.category ? listing.category.split(",") : []}
+                defaultSelectedKeys={
+                  listing?.category
+                    ? Array.isArray(listing.category)
+                      ? listing.category
+                      : typeof listing.category === 'string'
+                      ? listing.category.split(',').map(s => s.trim())
+                      : []
+                    : []
+                }
               >
                 {categories.map((cat) => (
                   <SelectItem key={cat.key}>{cat.label}</SelectItem>

@@ -132,9 +132,31 @@ export default function ListingDetailClient({ listing, ownerId, ownerUsername }:
           {/* Key Attributes Row */}
           <div className="flex flex-wrap gap-6 items-center mb-4 border-b border-default-200 pb-4">
             {listing.category && (
-              <Chip color="primary" variant="solid" size="lg" className="text-xl px-4 py-2">
-                {categoryLabel(listing.category)}
-              </Chip>
+              <div className="flex flex-wrap gap-2">
+                {(() => {
+                  let categoryKeys: string[] = [];
+                  if (typeof listing.category === 'string') {
+                    try {
+                      const parsed = JSON.parse(listing.category);
+                      if (Array.isArray(parsed)) {
+                        categoryKeys = parsed;
+                      } else {
+                        categoryKeys = [listing.category];
+                      }
+                    } catch (e) {
+                      categoryKeys = [listing.category];
+                    }
+                  } else if (Array.isArray(listing.category)) {
+                    categoryKeys = listing.category;
+                  }
+
+                  return categoryKeys.map((categoryKey, index) => (
+                    <Chip key={index} color="primary" variant="solid" size="lg" className="text-xl px-4 py-2">
+                      {categoryLabel(categoryKey)}
+                    </Chip>
+                  ));
+                })()}
+              </div>
             )}
             {listing.qty !== undefined && (
               <span className="text-lg bg-default-100 rounded px-4 py-2 font-semibold">Qty: {listing.qty}</span>
