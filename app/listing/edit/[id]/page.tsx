@@ -21,10 +21,14 @@ export default function EditListingPage() {
     { key: "onsite", label: "Only used on site" },
   ];
   const categories = [
-    { key: "office_material", label: "Office Material" },
-    { key: "gardening_supplies", label: "Gardening Supplies" },
+    { key: "office_material", label: "Office Equipment" },
+    { key: "outdoors", label: "Outdoors" },
     { key: "physical_space", label: "Physical Space" },
-    { key: "tools", label: "Tools" },
+    { key: "filming_equipment", label: "Filming Equipment" },
+    { key: "kids", label: "Kids" },
+    { key: "sports_and_games", label: "Sports and Games" },
+    { key: "kitchen_cooking", label: "Kitchen / Cooking" },
+    { key: "art_equipment", label: "Art Equipment" },
     { key: "other", label: "Other" },
   ];
   const router = useRouter();
