@@ -74,12 +74,17 @@ export default function EditListingPage() {
       const formData = new FormData(form);
       // Add images to formData
       selectedImages.forEach((file) => {
-        formData.append("image", file);
+        formData.append("images", file);
       });
       // Convert availability to a comma-separated string if needed
       if (formData.getAll("availability").length > 1) {
         const avail = formData.getAll("availability").join(",");
         formData.set("availability", avail);
+      }
+      // Convert category to a comma-separated string if needed
+      if (formData.getAll("category").length > 1) {
+        const cats = formData.getAll("category").join(",");
+        formData.set("category", cats);
       }
       // Set fee boolean and value
       formData.set("is_fee", isFee === "yes" ? "true" : "false");
@@ -206,7 +211,7 @@ export default function EditListingPage() {
                 placeholder="Select category"
                 selectionMode="multiple"
                 isRequired
-                defaultSelectedKeys={listing?.category ? [listing.category] : []}
+                defaultSelectedKeys={listing?.category ? listing.category.split(",") : []}
               >
                 {categories.map((cat) => (
                   <SelectItem key={cat.key}>{cat.label}</SelectItem>
