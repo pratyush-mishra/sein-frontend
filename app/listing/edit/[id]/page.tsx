@@ -15,6 +15,8 @@ export default function EditListingPage() {
   const [success, setSuccess] = useState(false);
   const [listing, setListing] = useState<any>(null);
   const [isPageLoading, setIsPageLoading] = useState(true);
+  const [deletingImageId, setDeletingImageId] = useState<number | null>(null);
+  const [imageDeletionError, setImageDeletionError] = useState("");
   const availability = [
     { key: "pickup", label: "Pick Up" },
     { key: "dropoff", label: "Drop Off" },
@@ -62,6 +64,50 @@ export default function EditListingPage() {
 
   const handleImagesChange = (files: File[]) => {
     setSelectedImages(files);
+  };
+
+  const handleDeleteImage = async (imageId: number) => {
+    if (deletingImageId) return; // Prevent multiple clicks while one is in progress
+    if (!window.confirm("Are you sure you want to delete this image?")) {
+      return;
+    }
+    setDeletingImageId(imageId);
+    setImageDeletionError("");
+
+    try {
+      const token = localStorage.getItem("access_token");
+      // This assumes your API has an endpoint at /api/images/{id}/ to delete an image.
+      // You may need to adjust this URL based on your backend's routing.
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/images/${imageId}/`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        let errorData;
+        try {
+          errorData = await res.json();
+        } catch (e) {
+          errorData = { detail: `Request failed with status ${res.status}` };
+        }
+        throw new Error(errorData.detail || "Failed to delete image.");
+      }
+
+      // On success, update the listing state to remove the image from the UI
+      setListing((prevListing: any) => {
+        if (!prevListing) return null;
+        return {
+          ...prevListing,
+          images: prevListing.images.filter((img: any) => img.id !== imageId),
+        };
+      });
+    } catch (err: any) {
+      setImageDeletionError(err.message);
+    } finally {
+      setDeletingImageId(null);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -230,18 +276,36 @@ export default function EditListingPage() {
             {/* Right Column - Image Upload */}
             <div className="flex flex-col gap-4">
               <h3 className="text-lg font-semibold">Resource Images</h3>
+              <p className="text-sm text-gray-500 -mt-3">Upload new images to add to this listing.</p>
               <ImageUpload
                 maxFiles={8}
                 maxSize={5}
                 acceptedTypes={['image/jpeg', 'image/png', 'image/gif', 'image/webp']}
                 onImagesChange={handleImagesChange}
               />
-              {/* Show existing images */}
+              {/* Show existing images with delete option */}
               {listing?.images && listing.images.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {listing.images.map((img: any) => (
-                    <img key={img.id} src={img.image} alt="Listing" className="w-20 h-20 object-cover rounded" />
-                  ))}
+                <div className="mt-2">
+                  <h4 className="text-md font-semibold mb-2">Current Images</h4>
+                  <div className="flex flex-wrap gap-3">
+                    {listing.images.map((img: any) => (
+                      <div key={img.id} className="relative">
+                        <img src={img.image} alt="Listing" className="w-24 h-24 object-cover rounded-lg shadow-sm" />
+                        <Button
+                          size="sm"
+                          color="danger"
+                          aria-label="Delete image"
+                          className="absolute top-1 right-1 z-10 h-6 w-6 min-w-0 p-0 rounded-full"
+                          onClick={() => handleDeleteImage(img.id)}
+                          isLoading={deletingImageId === img.id}
+                          disabled={!!deletingImageId}
+                        >
+                          {deletingImageId !== img.id && 'X'}
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                  {imageDeletionError && <div className="text-danger text-sm mt-2">{imageDeletionError}</div>}
                 </div>
               )}
             </div>
