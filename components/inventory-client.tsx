@@ -116,37 +116,54 @@ export default function InventoryClient({ listings, onSearch, onCategoryChange }
                     </div>
                   )}
                   <div className="p-8 flex-1 flex flex-col">
-                    {/* Category badge */}
+                    {/* Category badges */}
                     {listing.category && (
-                      <span
-                        className={
-                          (() => {
-                            // Try to match the category value to the index in categories
-                            const idx = categories.findIndex(([value]) => value === listing.category);
-                            const colorClasses = [
-                              "bg-pink-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full mb-2 w-fit font-semibold",
-                              "bg-blue-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full mb-2 w-fit font-semibold",
-                              "bg-green-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full mb-2 w-fit font-semibold",
-                              "bg-yellow-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full mb-2 w-fit font-semibold",
-                              "bg-purple-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full mb-2 w-fit font-semibold",
-                              "bg-red-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full mb-2 w-fit font-semibold",
-                              "bg-teal-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full mb-2 w-fit font-semibold",
-                              "bg-orange-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full mb-2 w-fit font-semibold",
-                              "bg-indigo-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full mb-2 w-fit font-semibold",
-                              "bg-cyan-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full mb-2 w-fit font-semibold",
-                            ];
-                            return colorClasses[
-                              idx >= 0 ? (idx + 1) % colorClasses.length : 0
-                            ];
-                          })()
-                        }
-                      >
-                        {/* Show the label if possible, else the value */}
+                      <div className="flex flex-wrap gap-2 mb-2">
                         {(() => {
-                          const found = categories.find(([value]) => value === listing.category);
-                          return found ? found[1] : listing.category;
+                          let categoryKeys: string[] = [];
+                          if (typeof listing.category === 'string') {
+                            try {
+                              // Try parsing it as a JSON array
+                              const parsed = JSON.parse(listing.category);
+                              if (Array.isArray(parsed)) {
+                                categoryKeys = parsed;
+                              } else {
+                                // It's a single string value
+                                categoryKeys = [listing.category];
+                              }
+                            } catch (e) {
+                              // Not a JSON string, treat as a single category key
+                              categoryKeys = [listing.category];
+                            }
+                          } else if (Array.isArray(listing.category)) {
+                            categoryKeys = listing.category;
+                          }
+
+                          const colorClasses = [
+                            "bg-pink-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
+                            "bg-blue-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
+                            "bg-green-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
+                            "bg-yellow-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
+                            "bg-purple-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
+                            "bg-red-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
+                            "bg-teal-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
+                            "bg-orange-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
+                            "bg-indigo-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
+                            "bg-cyan-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
+                          ];
+
+                          return categoryKeys.map((categoryKey, index) => {
+                            const found = categories.find(([value]) => value === categoryKey);
+                            const label = found ? found[1] : categoryKey;
+                            const colorClass = colorClasses[index % colorClasses.length];
+                            return (
+                              <span key={index} className={colorClass}>
+                                {label}
+                              </span>
+                            );
+                          });
                         })()}
-                      </span>
+                      </div>
                     )}
                     <h2 className="text-2xl font-semibold mb-4">{listing.title}</h2>
                     <p className="text-lg text-default-600 mb-4 flex-1">{listing.description}</p>

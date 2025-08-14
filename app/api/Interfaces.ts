@@ -81,7 +81,7 @@ export interface Listing {
     description: string;
     images?: { id: number; image: string }[];
     contact_details?: string;
-    category?: string;
+    category?: string | string[];
     qty?: number;
     is_fee?: boolean;
     fee?: number;
