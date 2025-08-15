@@ -131,7 +131,6 @@ export default function EditListingPage() {
         const avail = formData.getAll("availability").join(",");
         formData.set("availability", avail);
       }
-      // DEBUG: Let's see exactly what's in FormData (alternative method)
       console.log('Categories from getAll:', formData.getAll("category"));
       console.log('Availability from getAll:', formData.getAll("availability"));
       console.log('Title:', formData.get("title"));
@@ -144,12 +143,23 @@ export default function EditListingPage() {
       
       // SOLUTION: Remove all category entries and add them back as separate fields
       formData.delete("category");
+      console.log('After delete, categories:', formData.getAll("category"));
       
       // Method 2: Send as multiple form fields (this should work with Django)
-      categories.forEach(cat => {
+      categories.forEach((cat, index) => {
+        console.log(`Appending category ${index}:`, cat);
         formData.append("category", cat);
+        console.log(`After appending ${cat}, categories:`, formData.getAll("category"));
       });
       console.log('Sending categories as multiple fields:', categories);
+      
+      // Set fee boolean and value
+      formData.set("is_fee", isFee === "yes" ? "true" : "false");
+      
+      // Check if anything is modifying categories after this
+      console.log('After setting is_fee, categories:', formData.getAll("category"));
+      
+      // Final debug - check how many category fields we have
       console.log('Final categories check:', formData.getAll("category"));
       // Send PATCH to backend
       const token = localStorage.getItem("access_token");
