@@ -67,47 +67,52 @@ export default function EditListingPage() {
   };
 
   const handleDeleteImage = async (imageId: number) => {
-    if (deletingImageId) return; // Prevent multiple clicks while one is in progress
-    if (!window.confirm("Are you sure you want to delete this image?")) {
-      return;
-    }
-    setDeletingImageId(imageId);
-    setImageDeletionError("");
+  if (deletingImageId) return; // Prevent multiple clicks while one is in progress
+  if (!window.confirm("Are you sure you want to delete this image?")) {
+    return;
+  }
+  setDeletingImageId(imageId);
+  setImageDeletionError("");
 
-    try {
-      const token = localStorage.getItem("access_token");
-      // DELETE request to delete an image.
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/listings/${id}/images/${imageId}/`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  try {
+    const token = localStorage.getItem("access_token");
+    
+    // Use the listing update endpoint with images_to_delete parameter
+    const formData = new FormData();
+    formData.append('images_to_delete', imageId.toString());
+    
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/listings/${id}/`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
 
-      if (!res.ok) {
-        let errorData;
-        try {
-          errorData = await res.json();
-        } catch (e) {
-          errorData = { detail: `Request failed with status ${res.status}` };
-        }
-        throw new Error(errorData.detail || "Failed to delete image.");
+    if (!res.ok) {
+      let errorData;
+      try {
+        errorData = await res.json();
+      } catch (e) {
+        errorData = { detail: `Request failed with status ${res.status}` };
       }
-
-      // On success, update the listing state to remove the image from the UI
-      setListing((prevListing: any) => {
-        if (!prevListing) return null;
-        return {
-          ...prevListing,
-          images: prevListing.images.filter((img: any) => img.id !== imageId),
-        };
-      });
-    } catch (err: any) {
-      setImageDeletionError(err.message);
-    } finally {
-      setDeletingImageId(null);
+      throw new Error(errorData.detail || "Failed to delete image.");
     }
-  };
+
+    // On success, update the listing state to remove the image from the UI
+    setListing((prevListing: any) => {
+      if (!prevListing) return null;
+      return {
+        ...prevListing,
+        images: prevListing.images.filter((img: any) => img.id !== imageId),
+      };
+    });
+  } catch (err: any) {
+    setImageDeletionError(err.message);
+  } finally {
+    setDeletingImageId(null);
+  }
+};
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
