@@ -28,16 +28,16 @@ export default function InventoryClient({ listings, onSearch, onCategoryChange }
   ];
 
   const badgeColorClasses = [
-    "bg-pink-500 bg-opacity-70 text-white",
-    "bg-blue-500 bg-opacity-70 text-white",
-    "bg-green-500 bg-opacity-70 text-white",
-    "bg-yellow-500 bg-opacity-70 text-white",
-    "bg-purple-500 bg-opacity-70 text-white",
-    "bg-red-500 bg-opacity-70 text-white",
-    "bg-teal-500 bg-opacity-70 text-white",
-    "bg-orange-500 bg-opacity-70 text-white",
-    "bg-indigo-500 bg-opacity-70 text-white",
-    "bg-cyan-500 bg-opacity-70 text-white",
+    "bg-pink-500 bg-opacity-70",
+    "bg-blue-500 bg-opacity-70",
+    "bg-green-500 bg-opacity-70",
+    "bg-yellow-500 bg-opacity-70",
+    "bg-purple-500 bg-opacity-70",
+    "bg-red-500 bg-opacity-70",
+    "bg-teal-500 bg-opacity-70",
+    "bg-orange-500 bg-opacity-70",
+    "bg-indigo-500 bg-opacity-70",
+    "bg-cyan-500 bg-opacity-70",
   ];
 
   // Function to get consistent color for a category

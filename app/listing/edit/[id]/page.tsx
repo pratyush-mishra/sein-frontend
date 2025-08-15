@@ -131,9 +131,11 @@ export default function EditListingPage() {
         const avail = formData.getAll("availability").join(",");
         formData.set("availability", avail);
       }
-      console.log(formData.getAll("category"))
-      // Set fee boolean and value
-      formData.set("is_fee", isFee === "yes" ? "true" : "false");
+      formData.delete("category");
+    
+      // Method 1: Try as JSON array (most likely to work with your Django setup)
+      formData.set("category", JSON.stringify(categories));
+      console.log('Sending categories as JSON:', JSON.stringify(categories));
       // Send PATCH to backend
       const token = localStorage.getItem("access_token");
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/listings/${id}/`, {
