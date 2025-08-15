@@ -42,14 +42,20 @@ export default function InventoryClient({ listings, onSearch, onCategoryChange }
 
   // Function to get consistent color for a category
   const getCategoryColor = (categoryValue: string, isButton: boolean = false) => {
-    // Simple hash function to get consistent index for category
-    let hash = 0;
-    for (let i = 0; i < categoryValue.length; i++) {
-      const char = categoryValue.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Convert to 32bit integer
-    }
-    const index = Math.abs(hash) % colorClasses.length;
+    const categoryColorMap: { [key: string]: number } = {
+      'office_material': 0,
+      'outdoors': 1,
+      'physical_space': 2,
+      'filming_equipment': 3,
+      'kids': 4,
+      'sports_and_games': 5,
+      'kitchen_cooking': 6,
+      'art_equipment': 7,
+      'other': 8,
+      // Reserve index 9 for any future category
+    };
+    
+    const index = categoryColorMap[categoryValue] ?? 9; // Default to index 9 if category not found
     return isButton ? colorClasses[index] : badgeColorClasses[index];
   };
 

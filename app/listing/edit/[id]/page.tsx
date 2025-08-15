@@ -17,6 +17,7 @@ export default function EditListingPage() {
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [deletingImageId, setDeletingImageId] = useState<number | null>(null);
   const [imageDeletionError, setImageDeletionError] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
   const availability = [
     { key: "pickup", label: "Pick Up" },
     { key: "dropoff", label: "Drop Off" },
@@ -61,6 +62,12 @@ export default function EditListingPage() {
     }
     fetchListing();
   }, [id]);
+
+  useEffect(() => {
+  if (listing?.category && Array.isArray(listing.category)) {
+    setSelectedCategories(new Set(listing.category.map((cat: any) => String(cat))));
+  }
+  }, [listing]);
 
   const handleImagesChange = (files: File[]) => {
     setSelectedImages(files);
@@ -131,6 +138,13 @@ export default function EditListingPage() {
         const avail = formData.getAll("availability").join(",");
         formData.set("availability", avail);
       }
+      // Handle category manually from state (not from FormData)
+      formData.delete("category"); // Remove any existing category data
+      const categoryArray = Array.from(selectedCategories);
+      console.log('Categories being sent:', categoryArray);
+    
+      // Send as JSON array to match the API response format
+      formData.set("category", JSON.stringify(categoryArray));
       // Set fee boolean and value
       formData.set("is_fee", isFee === "yes" ? "true" : "false");
       // Send PATCH to backend
@@ -264,18 +278,13 @@ export default function EditListingPage() {
                 placeholder="Select category"
                 selectionMode="multiple"
                 isRequired
-                defaultSelectedKeys={
-                  listing?.category
-                    ? Array.isArray(listing.category)
-                      ? listing.category
-                      : typeof listing.category === 'string'
-                      ? listing.category.split(',').map((s: string) => s.trim())
-                      : []
-                    : []
-                }
+                selectedKeys={selectedCategories}
+                onSelectionChange={(keys) => setSelectedCategories(new Set(listing.category.map((cat: string) => cat)))}
               >
                 {categories.map((cat) => (
-                  <SelectItem key={cat.key}>{cat.label}</SelectItem>
+                  <SelectItem key={cat.key}>
+                    {cat.label}
+                  </SelectItem>
                 ))}
               </Select>
               <Textarea

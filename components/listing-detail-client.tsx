@@ -208,11 +208,15 @@ export default function ListingDetailClient({ listing, ownerId, ownerUsername }:
 
 function categoryLabel(key: string) {
   switch (key) {
-    case "office_material": return "Office Material";
-    case "gardening_supplies": return "Gardening Supplies";
+    case "office_material": return "Office Equipment";
+    case "filming_equipment": return "Filming Equipment";
     case "physical_space": return "Physical Space";
-    case "tools": return "Tools";
+    case "art_equipment": return "Art Equipment";
     case "other": return "Other";
+    case "outdoors": return "Outdoors";
+    case "kids": return "Kids";
+    case "sports_and_games": return "Sports and Games";
+    case "kitchen_cooking": return "Kitchen / Cooking";
     default: return key;
   }
 } 
