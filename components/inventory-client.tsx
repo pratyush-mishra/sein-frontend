@@ -13,6 +13,46 @@ export default function InventoryClient({ listings, onSearch, onCategoryChange }
   const [categories, setCategories] = useState([]);
   const isLoading = !listings;
 
+  // Color palette
+  const colorClasses = [
+    "bg-pink-500 bg-opacity-70 hover:bg-pink-600",
+    "bg-blue-500 bg-opacity-70 hover:bg-blue-600",
+    "bg-green-500 bg-opacity-70 hover:bg-green-600",
+    "bg-yellow-500 bg-opacity-70 hover:bg-yellow-600",
+    "bg-purple-500 bg-opacity-70 hover:bg-purple-600",
+    "bg-red-500 bg-opacity-70 hover:bg-red-600",
+    "bg-teal-500 bg-opacity-70 hover:bg-teal-600",
+    "bg-orange-500 bg-opacity-70 hover:bg-orange-600",
+    "bg-indigo-500 bg-opacity-70 hover:bg-indigo-600",
+    "bg-cyan-500 bg-opacity-70 hover:bg-cyan-600",
+  ];
+
+  const badgeColorClasses = [
+    "bg-pink-500 bg-opacity-70 text-white",
+    "bg-blue-500 bg-opacity-70 text-white",
+    "bg-green-500 bg-opacity-70 text-white",
+    "bg-yellow-500 bg-opacity-70 text-white",
+    "bg-purple-500 bg-opacity-70 text-white",
+    "bg-red-500 bg-opacity-70 text-white",
+    "bg-teal-500 bg-opacity-70 text-white",
+    "bg-orange-500 bg-opacity-70 text-white",
+    "bg-indigo-500 bg-opacity-70 text-white",
+    "bg-cyan-500 bg-opacity-70 text-white",
+  ];
+
+  // Function to get consistent color for a category
+  const getCategoryColor = (categoryValue: string, isButton: boolean = false) => {
+    // Simple hash function to get consistent index for category
+    let hash = 0;
+    for (let i = 0; i < categoryValue.length; i++) {
+      const char = categoryValue.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    const index = Math.abs(hash) % colorClasses.length;
+    return isButton ? colorClasses[index] : badgeColorClasses[index];
+  };
+
   useEffect(() => {
     async function fetchCategories() {
       try {
@@ -49,47 +89,25 @@ export default function InventoryClient({ listings, onSearch, onCategoryChange }
           type="search"
         />
       </div>
-      {/* Colorful category buttons */}
+      {/* Category buttons with consistent colors */}
       <div className="flex justify-center flex-wrap gap-4 my-4">
-        {(() => {
-          // Define a palette of Tailwind color classes
-          const colorClasses = [
-            "bg-pink-500 bg-opacity-70 hover:bg-pink-600 text-grey text-lg",
-            "bg-blue-500 bg-opacity-70 hover:bg-blue-600 text-grey text-lg",
-            "bg-green-500 bg-opacity-70 hover:bg-green-600 text-grey text-lg",
-            "bg-yellow-500 bg-opacity-70 hover:bg-yellow-600 text-grey text-lg",
-            "bg-purple-500 bg-opacity-70 hover:bg-purple-600 text-grey text-lg",
-            "bg-red-500 bg-opacity-70 hover:bg-red-600 text-grey text-lg",
-            "bg-teal-500 bg-opacity-70 hover:bg-teal-600 text-grey text-lg",
-            "bg-orange-500 bg-opacity-70 hover:bg-orange-600 text-grey text-lg",
-            "bg-indigo-500 bg-opacity-70 hover:bg-indigo-600 text-grey text-lg",
-            "bg-cyan-500 bg-opacity-70 hover:bg-cyan-600 text-grey text-lg",
-          ];
-          return (
-            <>
-              <Button
-                onClick={() => onCategoryChange("")}
-                size="lg" radius="full"
-                className={colorClasses[0] + " font-semibold transition-colors duration-200"}
-              >
-                All
-              </Button>
-              {categories.map(([value, label], idx) => (
-                <Button
-                  key={value}
-                  onClick={() => onCategoryChange(value)}
-                  size="lg" radius="full"
-                  className={
-                    colorClasses[(idx + 1) % colorClasses.length] +
-                    " font-semibold transition-colors duration-200"
-                  }
-                >
-                  {label}
-                </Button>
-              ))}
-            </>
-          );
-        })()}
+        <Button
+          onClick={() => onCategoryChange("")}
+          size="lg" radius="full"
+          className={`${colorClasses[0]} text-grey text-lg font-semibold transition-colors duration-200`}
+        >
+          All
+        </Button>
+        {categories.map(([value, label]) => (
+          <Button
+            key={value}
+            onClick={() => onCategoryChange(value)}
+            size="lg" radius="full"
+            className={`${getCategoryColor(value, true)} text-grey text-lg font-semibold transition-colors duration-200`}
+          >
+            {label}
+          </Button>
+        ))}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-12 px-4 mx-auto">
         {isLoading
@@ -116,7 +134,7 @@ export default function InventoryClient({ listings, onSearch, onCategoryChange }
                     </div>
                   )}
                   <div className="p-8 flex-1 flex flex-col">
-                    {/* Category badges */}
+                    {/* Category badges with consistent colors */}
                     {listing.category && (
                       <div className="flex flex-wrap gap-2 mb-2">
                         {(() => {
@@ -139,25 +157,15 @@ export default function InventoryClient({ listings, onSearch, onCategoryChange }
                             categoryKeys = listing.category;
                           }
 
-                          const colorClasses = [
-                            "bg-pink-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
-                            "bg-blue-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
-                            "bg-green-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
-                            "bg-yellow-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
-                            "bg-purple-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
-                            "bg-red-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
-                            "bg-teal-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
-                            "bg-orange-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
-                            "bg-indigo-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
-                            "bg-cyan-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
-                          ];
-
                           return categoryKeys.map((categoryKey, index) => {
                             const found = categories.find(([value]) => value === categoryKey);
                             const label = found ? found[1] : categoryKey;
-                            const colorClass = colorClasses[index % colorClasses.length];
+                            const colorClass = getCategoryColor(categoryKey);
                             return (
-                              <span key={index} className={colorClass}>
+                              <span 
+                                key={index} 
+                                className={`${colorClass} text-xs px-3 py-1 rounded-full w-fit font-semibold`}
+                              >
                                 {label}
                               </span>
                             );
@@ -175,4 +183,4 @@ export default function InventoryClient({ listings, onSearch, onCategoryChange }
       </div>
     </div>
   );
-} 
+}

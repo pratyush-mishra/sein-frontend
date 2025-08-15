@@ -126,11 +126,6 @@ export default function EditListingPage() {
         const avail = formData.getAll("availability").join(",");
         formData.set("availability", avail);
       }
-      // Convert category to a comma-separated string if needed
-      if (formData.getAll("category").length > 1) {
-        const cats = formData.getAll("category").join(",");
-        formData.set("category", cats);
-      }
       // Set fee boolean and value
       formData.set("is_fee", isFee === "yes" ? "true" : "false");
       // Send PATCH to backend
