@@ -134,8 +134,8 @@ export default function EditListingPage() {
       formData.delete("category");
     
       // Method 1: Try as JSON array (most likely to work with your Django setup)
-      formData.set("category", JSON.stringify(categories));
-      console.log('Sending categories as JSON:', JSON.stringify(categories));
+      formData.set("category", JSON.stringify(formData.getAll("category")));
+      console.log('Sending categories as JSON:', JSON.stringify(formData.getAll("category")));
       // Send PATCH to backend
       const token = localStorage.getItem("access_token");
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/listings/${id}/`, {
