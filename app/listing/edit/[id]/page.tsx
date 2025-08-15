@@ -131,12 +131,26 @@ export default function EditListingPage() {
         const avail = formData.getAll("availability").join(",");
         formData.set("availability", avail);
       }
+      // DEBUG: Let's see exactly what's in FormData (alternative method)
+      console.log('Categories from getAll:', formData.getAll("category"));
+      console.log('Availability from getAll:', formData.getAll("availability"));
+      console.log('Title:', formData.get("title"));
+      console.log('Description:', formData.get("description"));
+      
+      // Get categories from FormData
       const categories = formData.getAll("category");
+      console.log('Categories array:', categories);
+      console.log('Categories length:', categories.length);
+      
+      // SOLUTION: Remove all category entries and add them back as separate fields
       formData.delete("category");
-    
-      // Method 1: Try as JSON array (most likely to work with your Django setup)
-      formData.set("category", JSON.stringify(categories));
-      console.log('Sending categories as JSON:', JSON.stringify(categories));
+      
+      // Method 2: Send as multiple form fields (this should work with Django)
+      categories.forEach(cat => {
+        formData.append("category", cat);
+      });
+      console.log('Sending categories as multiple fields:', categories);
+      console.log('Final categories check:', formData.getAll("category"));
       // Send PATCH to backend
       const token = localStorage.getItem("access_token");
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/listings/${id}/`, {
