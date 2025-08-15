@@ -7,10 +7,11 @@ import Link from "next/link";
 import { Listing } from '@/app/api/Interfaces';
 import { Input } from "@heroui/input";
 import { Button } from "@heroui/react";
+import { categoryColors } from "@/config/colors";
 
 export default function InventoryClient({ listings, onSearch, onCategoryChange }: { listings: Listing[], onSearch: (search: string) => void, onCategoryChange: (category: string) => void }) {
   const [search, setSearch] = useState("");
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<[string, string][]>([]);
   const isLoading = !listings;
 
   useEffect(() => {
@@ -33,6 +34,10 @@ export default function InventoryClient({ listings, onSearch, onCategoryChange }
     onSearch(value);
   };
 
+  const getCategoryColor = (categoryValue: string) => {
+    return categoryColors[categoryValue] || "bg-gray-500";
+  };
+
   return (
     <div>
       <h1 className={`${title()} text-center`}>Inventory</h1>
@@ -51,45 +56,23 @@ export default function InventoryClient({ listings, onSearch, onCategoryChange }
       </div>
       {/* Colorful category buttons */}
       <div className="flex justify-center flex-wrap gap-4 my-4">
-        {(() => {
-          // Define a palette of Tailwind color classes
-          const colorClasses = [
-            "bg-pink-500 bg-opacity-70 hover:bg-pink-600 text-grey text-lg",
-            "bg-blue-500 bg-opacity-70 hover:bg-blue-600 text-grey text-lg",
-            "bg-green-500 bg-opacity-70 hover:bg-green-600 text-grey text-lg",
-            "bg-yellow-500 bg-opacity-70 hover:bg-yellow-600 text-grey text-lg",
-            "bg-purple-500 bg-opacity-70 hover:bg-purple-600 text-grey text-lg",
-            "bg-red-500 bg-opacity-70 hover:bg-red-600 text-grey text-lg",
-            "bg-teal-500 bg-opacity-70 hover:bg-teal-600 text-grey text-lg",
-            "bg-orange-500 bg-opacity-70 hover:bg-orange-600 text-grey text-lg",
-            "bg-indigo-500 bg-opacity-70 hover:bg-indigo-600 text-grey text-lg",
-            "bg-cyan-500 bg-opacity-70 hover:bg-cyan-600 text-grey text-lg",
-          ];
-          return (
-            <>
-              <Button
-                onClick={() => onCategoryChange("")}
-                size="lg" radius="full"
-                className={colorClasses[0] + " font-semibold transition-colors duration-200"}
-              >
-                All
-              </Button>
-              {categories.map(([value, label], idx) => (
-                <Button
-                  key={value}
-                  onClick={() => onCategoryChange(value)}
-                  size="lg" radius="full"
-                  className={
-                    colorClasses[(idx + 1) % colorClasses.length] +
-                    " font-semibold transition-colors duration-200"
-                  }
-                >
-                  {label}
-                </Button>
-              ))}
-            </>
-          );
-        })()}
+        <Button
+          onClick={() => onCategoryChange("")}
+          size="lg" radius="full"
+          className={`bg-pink-500 bg-opacity-70 hover:bg-pink-600 text-grey text-lg font-semibold transition-colors duration-200`}
+        >
+          All
+        </Button>
+        {categories.map(([value, label]) => (
+          <Button
+            key={value}
+            onClick={() => onCategoryChange(value)}
+            size="lg" radius="full"
+            className={`${getCategoryColor(value)} bg-opacity-70 hover:bg-opacity-100 text-white text-lg font-semibold transition-colors duration-200`}
+          >
+            {label}
+          </Button>
+        ))}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-12 px-4 mx-auto">
         {isLoading
@@ -123,39 +106,23 @@ export default function InventoryClient({ listings, onSearch, onCategoryChange }
                           let categoryKeys: string[] = [];
                           if (typeof listing.category === 'string') {
                             try {
-                              // Try parsing it as a JSON array
                               const parsed = JSON.parse(listing.category);
                               if (Array.isArray(parsed)) {
                                 categoryKeys = parsed;
                               } else {
-                                // It's a single string value
                                 categoryKeys = [listing.category];
                               }
                             } catch (e) {
-                              // Not a JSON string, treat as a single category key
                               categoryKeys = [listing.category];
                             }
                           } else if (Array.isArray(listing.category)) {
                             categoryKeys = listing.category;
                           }
 
-                          const colorClasses = [
-                            "bg-pink-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
-                            "bg-blue-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
-                            "bg-green-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
-                            "bg-yellow-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
-                            "bg-purple-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
-                            "bg-red-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
-                            "bg-teal-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
-                            "bg-orange-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
-                            "bg-indigo-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
-                            "bg-cyan-500 bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold",
-                          ];
-
                           return categoryKeys.map((categoryKey, index) => {
                             const found = categories.find(([value]) => value === categoryKey);
                             const label = found ? found[1] : categoryKey;
-                            const colorClass = colorClasses[index % colorClasses.length];
+                            const colorClass = `${getCategoryColor(categoryKey)} bg-opacity-70 text-white text-xs px-3 py-1 rounded-full w-fit font-semibold`;
                             return (
                               <span key={index} className={colorClass}>
                                 {label}
