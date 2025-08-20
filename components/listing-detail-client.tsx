@@ -212,6 +212,7 @@ function categoryLabel(key: string) {
     case "filming_equipment": return "Filming Equipment";
     case "physical_space": return "Physical Space";
     case "art_equipment": return "Art Equipment";
+    case "event_equipments": return "Event Equipment";
     case "other": return "Other";
     case "outdoors": return "Outdoors";
     case "kids": return "Kids";
