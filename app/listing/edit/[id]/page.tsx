@@ -27,6 +27,7 @@ export default function EditListingPage() {
     { key: "outdoors", label: "Outdoors" },
     { key: "physical_space", label: "Physical Space" },
     { key: "filming_equipment", label: "Filming Equipment" },
+    { key: "event_equipments", label: "Event Equipment" },
     { key: "kids", label: "Kids" },
     { key: "sports_and_games", label: "Sports and Games" },
     { key: "kitchen_cooking", label: "Kitchen / Cooking" },
