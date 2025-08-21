@@ -280,7 +280,7 @@ export default function MessagesClient({ initialMessages }: MessagesClientProps)
                 >
                   Send
                 </Button>
-                <div className="text-xs text-default-400 mt-1 self-end max-w-sm text-right">
+                <div className="text-s text-default-400 mt-1 self-end max-w-sm text-right">
                   Note: Users are notified about new messages once every 24 hours, unless they log in and see your message. Please expect a delay in response.
                 </div>
               </form>
